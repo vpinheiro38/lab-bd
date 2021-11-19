@@ -1,23 +1,28 @@
-import './App.css';
+import { useState } from "react";
+import { Routes, Route } from "react-router-dom";
+import Home from "./screens/home";
+import Login from "./screens/login";
+import './stylesheets/App.css';
 
 function App() {
+  const [token, setToken] = useState(1)
+  
+  const LoginRoute = () => (
+    <Login />
+  )
+
+  const TasksRoute = () => (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      {/* <Route path="about" element={<About />} /> */}
+    </Routes>
+  )
+
   return (
     <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {token ? TasksRoute() : LoginRoute()}
     </div>
   );
-}
+} 
 
 export default App;

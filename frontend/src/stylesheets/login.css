@@ -1,0 +1,16 @@
+.form {
+  margin-bottom: 10px;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: medium;
+}
+
+.button-container {
+  width: 100%;
+  display: flex;
+}
