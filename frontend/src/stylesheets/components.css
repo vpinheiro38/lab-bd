@@ -2,5 +2,13 @@
   background-color: white;
   color: black;
   border-radius: 10px;
-  padding: 30px 50px 50px 50px;
+  padding: 30px 40px 50px 40px;
+}
+
+.dropdown {
+  margin-right: 10px;
+}
+
+.dropdown-menu {
+  font-size: 15px
 }
