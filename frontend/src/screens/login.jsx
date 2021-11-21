@@ -33,6 +33,9 @@ function Login() {
   const RegisterUser = () => (
     <form className='form'>
       <label className='input-container'>
+        <input className="input" type="password" placeholder='Nome' />
+      </label>
+      <label className='input-container'>
         <input className="input" type="text" placeholder='Email' />
       </label>
       <label className='input-container'>
