@@ -72,12 +72,11 @@ function TagList({ itemList, onEditItem, onExludeItem }) {
 function CategoryScreen() {
   const { signOut } = useSession();
   const [tags, setTags] = useState([...taskList]);
+  const [renderCompleted, setRenderCompleted] = useState(false);
   const [newTag, setNewTag] = useState("");
 
-  const onExit = useCallback(() => signOut(), [signOut]);
-
-  const handleNewTag = useCallback((event) => {
-    setNewTag(event.target.value);
+  const onExit = useCallback(() => {
+    signOut();
   }, []);
 
   const onEditItem = useCallback(
@@ -91,7 +90,9 @@ function CategoryScreen() {
 
   const onExludeItem = useCallback(
     (index) => {
-      const newArray = tags.filter((_, tagItemIndex) => tagItemIndex !== index);
+      const newArray = tags.filter(
+        (tagItem, tagItemIndex) => tagItemIndex !== index
+      );
       console.log(newArray, index);
       setTags(newArray);
     },
@@ -105,12 +106,16 @@ function CategoryScreen() {
     setNewTag("");
   }, [tags, newTag]);
 
+  const handleNewTag = useCallback((event) => {
+    setNewTag(event.target.value);
+  }, []);
+
   return (
     <Card className="home-card">
       <div className="header">
-        <h1 className="title">Lista de Categorias</h1>
+        <h1 className="title">Routina</h1>
         <div>
-          <LinkButton to="/routine" describe="Rotinas" />
+          <LinkButton to="/category" describe="Categorias" />
           <LinkButton to="/" describe="Tarefas" />
           <button className="button" onClick={onExit}>
             Sair

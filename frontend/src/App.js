@@ -1,12 +1,14 @@
-import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "./screens/home";
 import Category from "./screens/category";
+import Routine from "./screens/routine";
 import Login from "./screens/login";
 import "./stylesheets/App.css";
 
+import { useSession } from "./contexts/useSession";
+
 function App() {
-  const [token, setToken] = useState(1);
+  const { token } = useSession();
 
   const LoginRoute = () => <Login />;
 
@@ -14,7 +16,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/category" element={<Category />} />
-      {/* <Route path="about" element={<About />} /> */}
+      <Route path="/routine" element={<Routine />} />
     </Routes>
   );
 
