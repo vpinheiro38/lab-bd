@@ -69,6 +69,7 @@ function TagList({ itemList, onEditItem, onExludeItem }) {
 function CategoryScreen() {
   const [tags, setTags] = useState([...taskList]);
   const [renderCompleted, setRenderCompleted] = useState(false);
+  const [newTag, setNewTag] = useState("");
 
   const onExit = useCallback(() => {}, []);
 
@@ -92,6 +93,17 @@ function CategoryScreen() {
     [tags]
   );
 
+  const createNewItem = useCallback(() => {
+    const newArray = tags;
+    newArray.push({ id: tags.length, description: newTag });
+    setTags(newArray);
+    setNewTag("");
+  }, [tags, newTag]);
+
+  const handleNewTag = useCallback((event) => {
+    setNewTag(event.target.value);
+  }, []);
+
   return (
     <Card className="home-card">
       <div className="header">
@@ -113,6 +125,15 @@ function CategoryScreen() {
             Sair
           </button>
         </div>
+      </div>
+
+      <div className="add">
+        <input
+          className="text-container"
+          value={newTag}
+          onChange={handleNewTag}
+        />
+        <Icon iconName="fa-plus" onClick={createNewItem} />
       </div>
 
       <TagList
