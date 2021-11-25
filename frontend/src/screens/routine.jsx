@@ -6,26 +6,43 @@ import "../stylesheets/home.css";
 
 import { useSession } from "../contexts/useSession";
 
-const taskList = [
+const routineList = [
   {
     id: 0,
     description: "Descrição da Tarefa",
+    tags: [{ id: 0, description: "Tag 1" }],
   },
   {
     id: 1,
     description: "Descrição da Tarefa",
+    tags: [
+      { id: 0, description: "Tag 1" },
+      { id: 1, description: "Tag 2" },
+    ],
   },
   {
     id: 2,
     description: "Descrição da Tarefa",
+    tags: [
+      { id: 0, description: "Tag 1" },
+      { id: 1, description: "Tag 2" },
+      { id: 2, description: "Tag 3" },
+    ],
   },
 ];
 
-function TagItem({ item, index, onEditItem, onExludeItem }) {
+function CardItem({ item, index, onEditItem, onExludeItem }) {
   const [editable, setEditable] = useState(true);
   return (
     <div key={item.id} className="task">
       <div className="text-container">
+        <div className="tags">
+          {item.tags.map((tag) => (
+            <span key={tag.id} className="tag is-primary">
+              {tag.description}
+            </span>
+          ))}
+        </div>
         {!editable ? (
           <input
             className="text-container"
@@ -48,7 +65,7 @@ function TagItem({ item, index, onEditItem, onExludeItem }) {
   );
 }
 
-function TagList({ itemList, onEditItem, onExludeItem }) {
+function CardList({ itemList, onEditItem, onExludeItem }) {
   return (
     <div className="tasks-container">
       {itemList.length === 0 ? (
@@ -57,7 +74,7 @@ function TagList({ itemList, onEditItem, onExludeItem }) {
         </div>
       ) : (
         itemList.map((item, index) => (
-          <TagItem
+          <CardItem
             item={item}
             onEditItem={onEditItem}
             onExludeItem={onExludeItem}
@@ -69,41 +86,39 @@ function TagList({ itemList, onEditItem, onExludeItem }) {
   );
 }
 
-function CategoryScreen() {
+function Screen() {
   const { signOut } = useSession();
-  const [tags, setTags] = useState([...taskList]);
+  const [items, setItems] = useState([...routineList]);
   const [newTag, setNewTag] = useState("");
 
-  const onExit = useCallback(() => {
-    signOut();
-  }, []);
+  const onExit = useCallback(() => signOut(), [signOut]);
 
   const onEditItem = useCallback(
     (index, description) => {
-      const newArray = [...tags];
+      const newArray = [...items];
       newArray[index] = { description: description.target.value };
-      setTags(newArray);
+      setItems(newArray);
     },
-    [tags]
+    [items]
   );
 
   const onExludeItem = useCallback(
     (index) => {
-      const newArray = tags.filter(
+      const newArray = items.filter(
         (tagItem, tagItemIndex) => tagItemIndex !== index
       );
       console.log(newArray, index);
-      setTags(newArray);
+      setItems(newArray);
     },
-    [tags]
+    [items]
   );
 
   const createNewItem = useCallback(() => {
-    const newArray = tags;
-    newArray.push({ id: tags.length, description: newTag });
-    setTags(newArray);
+    const newArray = items;
+    newArray.push({ id: items.length, description: newTag });
+    setItems(newArray);
     setNewTag("");
-  }, [tags, newTag]);
+  }, [items, newTag]);
 
   const handleNewTag = useCallback((event) => {
     setNewTag(event.target.value);
@@ -131,8 +146,8 @@ function CategoryScreen() {
         <Icon iconName="fa-plus" onClick={createNewItem} />
       </div>
 
-      <TagList
-        itemList={tags}
+      <CardList
+        itemList={items}
         onEditItem={onEditItem}
         onExludeItem={onExludeItem}
       />
@@ -140,4 +155,4 @@ function CategoryScreen() {
   );
 }
 
-export default CategoryScreen;
+export default Screen;
