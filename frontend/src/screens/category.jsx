@@ -9,171 +9,14 @@ const taskList = [
   {
     id: 0,
     description: "Descrição da Tarefa",
-    completed: false,
-    creationDate: "2021-11-18T22:28:00.188Z",
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
   },
   {
     id: 1,
     description: "Descrição da Tarefa",
-    completed: true,
-    creationDate: "2021-11-18T22:28:00.188Z",
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 1,
-    description: "Descrição da Tarefa",
-    completed: true,
-    creationDate: "2021-11-18T22:28:00.188Z",
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 1,
-    description: "Descrição da Tarefa",
-    completed: true,
-    creationDate: "2021-11-18T22:28:00.188Z",
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 1,
-    description: "Descrição da Tarefa",
-    completed: true,
-    creationDate: "2021-11-18T22:28:00.188Z",
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 1,
-    description: "Descrição da Tarefa",
-    completed: true,
-    creationDate: "2021-11-18T22:28:00.188Z",
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
   },
   {
     id: 2,
     description: "Descrição da Tarefa",
-    completed: false,
-    creationDate: "2021-11-18T22:28:00.188Z",
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 2,
-    description: "Descrição da Tarefa",
-    completed: false,
-    creationDate: "2021-11-18T22:28:00.188Z",
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 2,
-    description: "Descrição da Tarefa",
-    completed: false,
-    creationDate: "2021-11-18T22:28:00.188Z",
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 2,
-    description: "Descrição da Tarefa",
-    completed: false,
-    creationDate: "2021-11-18T22:28:00.188Z",
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 2,
-    description: "Descrição da Tarefa",
-    completed: false,
-    creationDate: "2021-11-18T22:28:00.188Z",
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 2,
-    description: "Descrição da Tarefa",
-    completed: false,
-    creationDate: "2021-11-18T22:28:00.188Z",
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 2,
-    description: "Descrição da Tarefa",
-    completed: false,
-    creationDate: "2021-11-18T22:28:00.188Z",
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
   },
 ];
 
@@ -201,27 +44,18 @@ function CategoryScreen() {
           <h6 className="subtitle is-6">Nenhuma Tarefa</h6>
         </div>
       ) : (
-        tasks
-          .filter((t) => t.completed === completed)
-          .map((task) => (
-            <div key={task.id} className="task">
-              <div className="text-container">
-                <div className="tags">
-                  {task.tags.map((tag) => (
-                    <span key={tag.id} className="tag is-primary">
-                      Primary
-                    </span>
-                  ))}
-                </div>
-                <p className="text">{task.description}</p>
-              </div>
-              <div className="buttons">
-                <Icon iconName="fa-check" />
-                <Icon iconName="fa-edit" />
-                <Icon iconName="fa-trash" />
-              </div>
+        tasks.map((task) => (
+          <div key={task.id} className="task">
+            <div className="text-container">
+              <p className="text">{task.description}</p>
             </div>
-          ))
+            <div className="buttons">
+              <Icon iconName="fa-check" />
+              <Icon iconName="fa-edit" />
+              <Icon iconName="fa-trash" />
+            </div>
+          </div>
+        ))
       )}
     </div>
   );
@@ -248,15 +82,7 @@ function CategoryScreen() {
           </button>
         </div>
       </div>
-      {!renderCompleted && (
-        <div className="filters">
-          <Dropdown title="Filtro de Prioridades" />
-          <Dropdown title="Filtro de Categorias" />
-          <button className="button" onClick={onExit}>
-            Ver Tarefas para Agora
-          </button>
-        </div>
-      )}
+
       {renderCompleted ? (
         <TaskList title="Concluídas" completed={true} />
       ) : (
