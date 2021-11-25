@@ -72,7 +72,6 @@ function TagList({ itemList, onEditItem, onExludeItem }) {
 function CategoryScreen() {
   const { signOut } = useSession();
   const [tags, setTags] = useState([...taskList]);
-  const [renderCompleted, setRenderCompleted] = useState(false);
   const [newTag, setNewTag] = useState("");
 
   const onExit = useCallback(() => {
