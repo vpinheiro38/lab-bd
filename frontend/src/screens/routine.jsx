@@ -2,15 +2,20 @@ import { useState, useCallback } from "react";
 import Card from "../components/card";
 import Icon from "../components/icon";
 import LinkButton from "../components/linkbutton";
+import Modal from "../components/modal";
 import "../stylesheets/home.css";
 
 import { useSession } from "../contexts/useSession";
+import Dropdown from "../components/dropdown";
 
 const routineList = [
   {
     id: 0,
     description: "Descrição da Tarefa",
     tags: [{ id: 0, description: "Tag 1" }],
+    routines: [
+      { id: 0, turn: "Manhã", weekdays: ["segunda-feira", "quarta-feira"] },
+    ],
   },
   {
     id: 1,
@@ -18,6 +23,10 @@ const routineList = [
     tags: [
       { id: 0, description: "Tag 1" },
       { id: 1, description: "Tag 2" },
+    ],
+    routines: [
+      { id: 0, turn: "Manhã", weekdays: ["segunda-feira", "quarta-feira"] },
+      { id: 1, turn: "Tarde", weekdays: ["terça-feira", "quinta-feira"] },
     ],
   },
   {
@@ -28,11 +37,15 @@ const routineList = [
       { id: 1, description: "Tag 2" },
       { id: 2, description: "Tag 3" },
     ],
+    routines: [{ id: 0, turn: "Manhã", weekdays: ["sábado", "domingo"] }],
   },
 ];
 
 function CardItem({ item, index, onEditItem, onExludeItem }) {
-  const [editable, setEditable] = useState(true);
+  const [isVisible, setVisible] = useState(false);
+
+  const handleVisible = useCallback(() => setVisible(!isVisible), [isVisible]);
+
   return (
     <div key={item.id} className="task">
       <div className="text-container">
@@ -43,24 +56,57 @@ function CardItem({ item, index, onEditItem, onExludeItem }) {
             </span>
           ))}
         </div>
-        {!editable ? (
-          <input
-            className="text-container"
-            value={item.description}
-            onChange={(description) => onEditItem(index, description)}
-          />
-        ) : (
-          <p className="text">{item.description}</p>
-        )}
+
+        <p className="text">{item.description}</p>
+
+        <section className="routines">
+          {item.routines.map((routine) => (
+            <p className="routine_item" key={routine.id}>
+              {routine.turn}
+            </p>
+          ))}
+        </section>
       </div>
       <div className="buttons">
-        {editable ? (
-          <Icon iconName="fa-edit" onClick={() => setEditable(false)} />
-        ) : (
-          <Icon iconName="fa-check" onClick={() => setEditable(true)} />
-        )}
+        <Icon iconName="fa-edit" onClick={handleVisible} />
         <Icon iconName="fa-trash" onClick={() => onExludeItem(index)} />
       </div>
+
+      <Modal
+        modalState={isVisible}
+        closeModal={handleVisible}
+        title="Editar Routina"
+      >
+        <section className="modal_content">
+          <div className="modal_content">
+            <h6>Titulo: </h6>
+            <input
+              className="text-container input"
+              value={item.description}
+              onChange={(description) => onEditItem(index, description)}
+            />
+          </div>
+
+          <div className="modal_content">
+            <h6>Categorias: </h6>
+            {item.tags.map((rountine) => (
+              <div key={rountine.id} className="add">
+                <Dropdown title="Categorias" />
+              </div>
+            ))}
+          </div>
+
+          <div className="modal_content">
+            <h6>Disponibilidade: </h6>
+            {item.routines.map((rountine) => (
+              <div key={rountine.id} className="add">
+                <Dropdown title="Turno" />
+                <Dropdown title="Dias da Semana" />
+              </div>
+            ))}
+          </div>
+        </section>
+      </Modal>
     </div>
   );
 }
@@ -137,14 +183,9 @@ function Screen() {
         </div>
       </div>
 
-      <div className="add">
-        <input
-          className="text-container"
-          value={newTag}
-          onChange={handleNewTag}
-        />
+      <section className="add_button">
         <Icon iconName="fa-plus" onClick={createNewItem} />
-      </div>
+      </section>
 
       <CardList
         itemList={items}
