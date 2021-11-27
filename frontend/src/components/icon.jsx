@@ -1,4 +1,4 @@
-import '../stylesheets/components.css'
+import "../stylesheets/components.css";
 
 function Icon({ iconName, onClick }) {
   return (
@@ -7,7 +7,7 @@ function Icon({ iconName, onClick }) {
         <i className={`fas ${iconName}`}></i>
       </span>
     </button>
-  )
+  );
 }
 
 export default Icon;

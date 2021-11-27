@@ -2,20 +2,27 @@ import { useEffect, useState } from "react";
 import Card from "../components/card";
 import Icon from "../components/icon";
 import '../stylesheets/home.css'
+import Multiselect from "multiselect-react-dropdown";
+import LinkButton from "../components/linkbutton";
 import Dropdown from "../components/dropdown";
 import Task from "../components/task";
 import { Link } from "react-router-dom";
 
+import { useSession } from "../contexts/useSession";
+
 const taskList = [
   {
     id: 0,
-    description: 'Descrição da Tarefa',
+    description: "Descrição da Tarefa",
     completed: false,
-    creationDate: '2021-11-18T22:28:00.188Z',
+    creationDate: "2021-11-18T22:28:00.188Z",
     completedDate: undefined,
     priorityId: 2,
     userId: 1,
-    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
+    tags: [
+      { id: 0, description: "Tag 1" },
+      { id: 1, description: "Tag 1" },
+    ],
   },
   {
     id: 2,
@@ -25,7 +32,10 @@ const taskList = [
     completedDate: undefined,
     priorityId: 1,
     userId: 1,
-    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
+    tags: [
+      { id: 0, description: "Tag 1" },
+      { id: 1, description: "Tag 1" },
+    ],
   },
   {
     id: 2,
@@ -35,7 +45,10 @@ const taskList = [
     completedDate: undefined,
     priorityId: 0,
     userId: 1,
-    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
+    tags: [
+      { id: 0, description: "Tag 1" },
+      { id: 1, description: "Tag 1" },
+    ],
   },
   {
     id: 2,
@@ -45,7 +58,10 @@ const taskList = [
     completedDate: undefined,
     priorityId: 0,
     userId: 1,
-    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
+    tags: [
+      { id: 0, description: "Tag 1" },
+      { id: 1, description: "Tag 1" },
+    ],
   },
   {
     id: 2,
@@ -55,7 +71,10 @@ const taskList = [
     completedDate: undefined,
     priorityId: 0,
     userId: 1,
-    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
+    tags: [
+      { id: 0, description: "Tag 1" },
+      { id: 1, description: "Tag 1" },
+    ],
   },
   {
     id: 2,
@@ -65,23 +84,29 @@ const taskList = [
     completedDate: undefined,
     priorityId: 0,
     userId: 1,
-    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
+    tags: [
+      { id: 0, description: "Tag 1" },
+      { id: 1, description: "Tag 1" },
+    ],
   },
   {
     id: 2,
-    description: 'Descrição da Tarefa',
+    description: "Descrição da Tarefa",
     completed: false,
-    creationDate: '2021-11-18T22:28:00.188Z',
+    creationDate: "2021-11-18T22:28:00.188Z",
     completedDate: undefined,
     priorityId: 0,
     userId: 1,
-    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
+    tags: [
+      { id: 0, description: "Tag 1" },
+      { id: 1, description: "Tag 1" },
+    ],
   },
   {
     id: 2,
-    description: 'Descrição da Tarefa',
+    description: "Descrição da Tarefa",
     completed: false,
-    creationDate: '2021-11-18T22:28:00.188Z',
+    creationDate: "2021-11-18T22:28:00.188Z",
     completedDate: undefined,
     priorityId: 0,
     userId: 1,
@@ -90,7 +115,6 @@ const taskList = [
 ]
 
 const tasksCompleted = [
-  
   {
     id: 1,
     description: 'Descrição da Tarefa',
@@ -99,7 +123,10 @@ const tasksCompleted = [
     completedDate: undefined,
     priorityId: 0,
     userId: 1,
-    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
+    tags: [
+      { id: 0, description: "Tag 1" },
+      { id: 1, description: "Tag 1" },
+    ],
   },
   {
     id: 1,
@@ -109,7 +136,10 @@ const tasksCompleted = [
     completedDate: undefined,
     priorityId: 0,
     userId: 1,
-    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
+    tags: [
+      { id: 0, description: "Tag 1" },
+      { id: 1, description: "Tag 1" },
+    ],
   },
   {
     id: 1,
@@ -119,7 +149,10 @@ const tasksCompleted = [
     completedDate: undefined,
     priorityId: 0,
     userId: 1,
-    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
+    tags: [
+      { id: 0, description: "Tag 1" },
+      { id: 1, description: "Tag 1" },
+    ],
   },
   {
     id: 1,
@@ -129,7 +162,10 @@ const tasksCompleted = [
     completedDate: undefined,
     priorityId: 0,
     userId: 1,
-    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
+    tags: [
+      { id: 0, description: "Tag 1" },
+      { id: 1, description: "Tag 1" },
+    ],
   },
   {
     id: 1,
@@ -149,12 +185,18 @@ const prioritiesList = [
   { id: 2, description: 'Baixa', numberPriority: 0 },
 ]
 
-function Home({ onExit }) {
+function Home() {
   const [renderCompleted, setRenderCompleted] = useState(false)
   const [completedTasks, setCompletedTasks] = useState([])
   const [incompletedTasks, setIncompletedTasks] = useState([])
   const [priorities, setPriorities] = useState([])
   const [categories, setCategories] = useState([])
+
+  const { signOut } = useSession();
+
+  const onExit = () => {
+    signOut();
+  };
 
   const resetFilter = () => {
     const priorityOptions = document.getElementById('priority').children
@@ -235,17 +277,17 @@ function Home({ onExit }) {
   }
 
   return (
-    <Card className='home-card'>
-      <div className='header'>
-        <h1 className='title'>Lista de Tarefas</h1>
+    <Card className="home-card">
+      <div className="header">
+        <h1 className="title">Lista de Tarefas</h1>
         <div>
-          <button className="button button-header is-light" onClick={onExit}>Rotinas</button>
-          <button className="button button-header is-light" onClick={onExit}>Categorias</button>
-          <button 
-            className="button button-header is-light"
+          <LinkButton to="/routine" describe="Rotinas" />
+          <LinkButton to="/category" describe="Categorias" />
+          <button
+            className="button button-header"
             onClick={() => setRenderCompleted(!renderCompleted)}
           >
-            Ver {renderCompleted ? 'Não Concluídas' : 'Concluídas'}
+            Ver {renderCompleted ? "Não Concluídas" : "Concluídas"}
           </button>
           <button className="button is-light" onClick={onExit}>Sair</button>
         </div>
@@ -271,12 +313,12 @@ function Home({ onExit }) {
         </div>
       )}
       {renderCompleted ? (
-        <TaskList title='Concluídas' completed={true} />
+        <TaskList title="Concluídas" completed={true} />
       ) : (
-        <TaskList title='Não Concluídas' completed={false} />
-      )}      
+        <TaskList title="Não Concluídas" completed={false} />
+      )}
     </Card>
-  )
+  );
 }
 
 export default Home;

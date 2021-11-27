@@ -4,8 +4,10 @@ import 'bulma/css/bulma.min.css';
 import './../stylesheets/login.css';
 import Card from '../components/card';
 import { isStringEmpty } from '../utils/utils';
+import { useSession } from "../contexts/useSession";
 
 function Login({ onLogin }) {
+  const { signIn } = useSession();
   const [isLogin, setIsLogin] = useState(true)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -22,7 +24,7 @@ function Login({ onLogin }) {
       return
     }
 
-    onLogin({})
+    signIn();
   }
 
   const onClickToRegister = (event) => {
@@ -32,10 +34,9 @@ function Login({ onLogin }) {
       return
     }
 
-    onLogin({})
   }
 
-  const onPressToChangeForm = () => setIsLogin(!isLogin)
+  const onPressToChangeForm = () => setIsLogin(!isLogin);
 
   const LoginUser = () => (
     <form className='form'>
@@ -49,7 +50,7 @@ function Login({ onLogin }) {
         <button className="button is-primary is-fullwidth" type="submit" onClick={onClickToLogin}>Entrar</button>
       </div>
     </form>
-  )
+  );
 
   const RegisterUser = () => (
     <form className='form'>
@@ -66,17 +67,17 @@ function Login({ onLogin }) {
         <button className="button is-primary is-fullwidth" type="submit" onClick={onClickToRegister}>Registrar</button>
       </div>
     </form>
-  )
+  );
 
   return (
     <Card>
       <h1 class="title">Gerenciador de Tarefas</h1>
       {isLogin ? LoginUser() : RegisterUser()}
-      <button className='button is-fullwidth' onClick={onPressToChangeForm}>
-        {isLogin ? 'Cadastrar Usuário' : 'Voltar'}
+      <button className="button is-fullwidth" onClick={onPressToChangeForm}>
+        {isLogin ? "Cadastrar Usuário" : "Voltar"}
       </button>
     </Card>
-  )
+  );
 }
 
 export default Login;
