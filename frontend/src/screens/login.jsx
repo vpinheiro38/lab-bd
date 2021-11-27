@@ -1,17 +1,38 @@
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 import 'bulma/css/bulma.min.css';
 import './../stylesheets/login.css';
 import Card from '../components/card';
+import { isStringEmpty } from '../utils/utils';
 
-function Login() {
+function Login({ onLogin }) {
   const [isLogin, setIsLogin] = useState(true)
-
-  const onLogin = () => {
-
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  
+  const errorFieldEmpty = () => {
+    toast.error('Você deixou algum campo vazio!')
   }
 
-  const onRegister = () => {
+  const onClickToLogin = (event) => {
+    event.preventDefault()
+    if (isStringEmpty(email) || isStringEmpty(password)) {
+      errorFieldEmpty()
+      return
+    }
 
+    onLogin({})
+  }
+
+  const onClickToRegister = (event) => {
+    event.preventDefault()
+    if (isStringEmpty(name) || isStringEmpty(email) || isStringEmpty(password)) {
+      errorFieldEmpty()
+      return
+    }
+
+    onLogin({})
   }
 
   const onPressToChangeForm = () => setIsLogin(!isLogin)
@@ -19,13 +40,13 @@ function Login() {
   const LoginUser = () => (
     <form className='form'>
       <label className='input-container'>
-        <input className="input" type="text" placeholder='Email' />
+        <input className="input" type="text" placeholder='Email' onChange={e => setEmail(e.target.value)} />
       </label>
       <label className='input-container'>
-        <input className="input" type="password" placeholder='Senha' />
+        <input className="input" type="password" placeholder='Senha' onChange={e => setPassword(e.target.value)} />
       </label>
       <div>
-        <button className="button is-primary is-fullwidth" type="submit" onClick={onLogin}>Entrar</button>
+        <button className="button is-primary is-fullwidth" type="submit" onClick={onClickToLogin}>Entrar</button>
       </div>
     </form>
   )
@@ -33,16 +54,16 @@ function Login() {
   const RegisterUser = () => (
     <form className='form'>
       <label className='input-container'>
-        <input className="input" type="password" placeholder='Nome' />
+        <input className="input" type="password" placeholder='Nome' onChange={e => setName(e.target.value)} />
       </label>
       <label className='input-container'>
-        <input className="input" type="text" placeholder='Email' />
+        <input className="input" type="text" placeholder='Email' onChange={e => setEmail(e.target.value)} />
       </label>
       <label className='input-container'>
-        <input className="input" type="password" placeholder='Senha' />
+        <input className="input" type="password" placeholder='Senha' onChange={e => setPassword(e.target.value)} />
       </label>
       <div>
-        <button className="button is-primary is-fullwidth" type="submit" onClick={onRegister}>Registrar</button>
+        <button className="button is-primary is-fullwidth" type="submit" onClick={onClickToRegister}>Registrar</button>
       </div>
     </form>
   )

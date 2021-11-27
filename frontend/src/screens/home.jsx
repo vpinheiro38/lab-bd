@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Card from "../components/card";
 import Icon from "../components/icon";
-import Multiselect from 'multiselect-react-dropdown'
 import '../stylesheets/home.css'
 import Dropdown from "../components/dropdown";
+import Task from "../components/task";
+import { Link } from "react-router-dom";
 
 const taskList = [
   {
@@ -12,57 +13,7 @@ const taskList = [
     completed: false,
     creationDate: '2021-11-18T22:28:00.188Z',
     completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
-  },
-  {
-    id: 1,
-    description: 'Descrição da Tarefa',
-    completed: true,
-    creationDate: '2021-11-18T22:28:00.188Z',
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
-  },
-  {
-    id: 1,
-    description: 'Descrição da Tarefa',
-    completed: true,
-    creationDate: '2021-11-18T22:28:00.188Z',
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
-  },
-  {
-    id: 1,
-    description: 'Descrição da Tarefa',
-    completed: true,
-    creationDate: '2021-11-18T22:28:00.188Z',
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
-  },
-  {
-    id: 1,
-    description: 'Descrição da Tarefa',
-    completed: true,
-    creationDate: '2021-11-18T22:28:00.188Z',
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
-  },
-  {
-    id: 1,
-    description: 'Descrição da Tarefa',
-    completed: true,
-    creationDate: '2021-11-18T22:28:00.188Z',
-    completedDate: undefined,
-    priorityId: 0,
+    priorityId: 2,
     userId: 1,
     tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
   },
@@ -72,7 +23,7 @@ const taskList = [
     completed: false,
     creationDate: '2021-11-18T22:28:00.188Z',
     completedDate: undefined,
-    priorityId: 0,
+    priorityId: 1,
     userId: 1,
     tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
   },
@@ -138,78 +89,185 @@ const taskList = [
   }
 ]
 
-function Home() {
-  const [tasks, setTasks] = useState([...taskList])
-  const [renderCompleted, setRenderCompleted] = useState(false)
-  const priorities = [
-    {id: 0, name: 'Baixa'},
-    {id: 1, name: 'Média'},
-    {id: 2, name: 'Alta'},
-  ]
-  const [selectedPriorities, setSelectedPriorities] = useState([])
+const tasksCompleted = [
   
-  const onExit = () => {
+  {
+    id: 1,
+    description: 'Descrição da Tarefa',
+    completed: true,
+    creationDate: '2021-11-18T22:28:00.188Z',
+    completedDate: undefined,
+    priorityId: 0,
+    userId: 1,
+    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
+  },
+  {
+    id: 1,
+    description: 'Descrição da Tarefa',
+    completed: true,
+    creationDate: '2021-11-18T22:28:00.188Z',
+    completedDate: undefined,
+    priorityId: 0,
+    userId: 1,
+    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
+  },
+  {
+    id: 1,
+    description: 'Descrição da Tarefa',
+    completed: true,
+    creationDate: '2021-11-18T22:28:00.188Z',
+    completedDate: undefined,
+    priorityId: 0,
+    userId: 1,
+    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
+  },
+  {
+    id: 1,
+    description: 'Descrição da Tarefa',
+    completed: true,
+    creationDate: '2021-11-18T22:28:00.188Z',
+    completedDate: undefined,
+    priorityId: 0,
+    userId: 1,
+    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
+  },
+  {
+    id: 1,
+    description: 'Descrição da Tarefa',
+    completed: true,
+    creationDate: '2021-11-18T22:28:00.188Z',
+    completedDate: undefined,
+    priorityId: 0,
+    userId: 1,
+    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
+  },
+]
 
+const prioritiesList = [
+  { id: 0, description: 'Alta', numberPriority: 2 },
+  { id: 1, description: 'Média', numberPriority: 1 },
+  { id: 2, description: 'Baixa', numberPriority: 0 },
+]
+
+function Home({ onExit }) {
+  const [renderCompleted, setRenderCompleted] = useState(false)
+  const [completedTasks, setCompletedTasks] = useState([])
+  const [incompletedTasks, setIncompletedTasks] = useState([])
+  const [priorities, setPriorities] = useState([])
+  const [categories, setCategories] = useState([])
+
+  const resetFilter = () => {
+    const priorityOptions = document.getElementById('priority').children
+    const categoryOptions = document.getElementById('category').children
+
+    for (let option of priorityOptions) {      
+      option.selected = false
+    }
+
+    for (let option of categoryOptions) {
+      option.selected = false
+    }
   }
 
-  const onFilterPriorities = (selectedList, selectedItem) => {
-    
+  const onFilterPriorities = (selectedPriorities) => {
+    setIncompletedTasks(taskList)
   }
 
-  const onUnfilterPriorities = (selectedList, selectedItem) => {
-
+  const onFilterCategories = (selectedCategories) => {
+    setIncompletedTasks(taskList)
   }
 
-  const TaskList = ({ title, completed }) => (
-    <div className='tasks-container'>
-      <h2 className='subtitle'>{title}</h2>
-      {tasks.length === 0 ? (
-        <div className='no-tasks'>
-          <h6 className='subtitle is-6'>Nenhuma Tarefa</h6>
-        </div>
-      ) : (
-        tasks.filter(t => t.completed === completed).map(task => (
-          <div key={task.id} className='task'>
-            <div className='text-container'>
-              <div className='tags'>
-                {task.tags.map(tag => (
-                  <span key={tag.id} className="tag is-primary">Primary</span>
-                ))}
-              </div>
-              <p className='text'>{task.description}</p>
-            </div>
-            <div className='buttons'>
-              <Icon iconName='fa-check' />
-              <Icon iconName='fa-edit' />
-              <Icon iconName='fa-trash' />
-            </div>
+  const onFilterNow = (event) => {
+    resetFilter()
+    setIncompletedTasks(taskList)
+  }
+
+  const completeTask = (task) => {
+    setIncompletedTasks(taskList)
+    setCompletedTasks(tasksCompleted)
+  }
+
+  const deleteTask = (task) => {
+    const completed = task.completed
+
+    if (completed)
+      setCompletedTasks(tasksCompleted)
+    else
+      setIncompletedTasks(taskList)
+  }
+
+  useEffect(() => {
+    setCompletedTasks(tasksCompleted)
+    setIncompletedTasks(taskList)
+  }, [])
+
+  useEffect(() => {
+    setPriorities(prioritiesList)
+  }, [])
+
+  useEffect(() => {
+    setCategories([])
+  }, [])
+
+  const TaskList = ({ title, completed }) => {
+    const tasks = completed ? completedTasks : incompletedTasks
+
+    return (
+      <div className='tasks-container'>
+        <h2 className='subtitle'>{title}</h2>
+        {tasks.length === 0 ? (
+          <div className='no-tasks'>
+            <h6 className='subtitle is-6'>Nenhuma Tarefa</h6>
           </div>
-        ))
-      )}
-    </div>
-  )
+        ) : (
+          tasks.map(task => (
+            <Task
+              key={task.id}
+              task={task}              
+              priorities={priorities}
+              onCompleteTask={completeTask}
+              onDeleteTask={deleteTask}
+            />
+          ))
+        )}
+      </div>
+    )
+  }
 
   return (
     <Card className='home-card'>
       <div className='header'>
         <h1 className='title'>Lista de Tarefas</h1>
         <div>
-          <button className="button button-header" onClick={onExit}>Rotinas</button>
-          <button className="button button-header" onClick={onExit}>Categorias</button>
+          <button className="button button-header is-light" onClick={onExit}>Rotinas</button>
+          <button className="button button-header is-light" onClick={onExit}>Categorias</button>
           <button 
-            className="button button-header"
+            className="button button-header is-light"
             onClick={() => setRenderCompleted(!renderCompleted)}
           >
             Ver {renderCompleted ? 'Não Concluídas' : 'Concluídas'}
           </button>
-          <button className="button" onClick={onExit}>Sair</button>
+          <button className="button is-light" onClick={onExit}>Sair</button>
         </div>
       </div>
       {!renderCompleted && (
         <div className='filters'>
-          <Dropdown title='Filtro de Prioridades'/>
-          <Dropdown title='Filtro de Categorias'/>
-          <button className="button" onClick={onExit}>Ver Tarefas para Agora</button>
+          <Dropdown 
+            type='priority'
+            title='Filtro de Prioridades'
+            options={priorities}
+            onFilter={onFilterPriorities}          
+          />
+          <Dropdown 
+            type='category'
+            title='Filtro de Categorias'
+            options={[]}
+            onFilter={onFilterCategories}              
+          />
+          <button className="button button-header" onClick={onFilterNow}>Ver Tarefas para Agora</button>
+          <Link to='/task'>
+            <button className="button is-link">Adicionar Tarefa</button>
+          </Link>
         </div>
       )}
       {renderCompleted ? (
