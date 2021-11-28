@@ -13,11 +13,16 @@ const app_service_1 = require("./app.service");
 const users_module_1 = require("./users/users.module");
 const priorities_module_1 = require("./priorities/priorities.module");
 const tasks_module_1 = require("./tasks/tasks.module");
+const categories_module_1 = require("./categories/categories.module");
+const categories_tasks_module_1 = require("./categories-tasks/categories-tasks.module");
+const routines_module_1 = require("./routines/routines.module");
+const categories_routines_module_1 = require("./categories-routines/categories-routines.module");
+const disponibilities_module_1 = require("./disponibilities/disponibilities.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [users_module_1.UsersModule, priorities_module_1.PrioritiesModule, tasks_module_1.TasksModule],
+        imports: [users_module_1.UsersModule, priorities_module_1.PrioritiesModule, tasks_module_1.TasksModule, categories_module_1.CategoriesModule, categories_tasks_module_1.CategoriesTasksModule, routines_module_1.RoutinesModule, categories_routines_module_1.CategoriesRoutinesModule, disponibilities_module_1.DisponibilitiesModule],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })
