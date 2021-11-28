@@ -7,7 +7,7 @@ import { isStringEmpty } from '../utils/utils';
 import { useSession } from "../contexts/useSession";
 
 function Login({ onLogin }) {
-  const { signIn } = useSession();
+  const { register, signIn } = useSession();
   const [isLogin, setIsLogin] = useState(true)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -34,6 +34,7 @@ function Login({ onLogin }) {
       return
     }
 
+    register(name, email, password)
   }
 
   const onPressToChangeForm = () => setIsLogin(!isLogin);
