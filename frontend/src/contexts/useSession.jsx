@@ -1,47 +1,56 @@
 import {
   useState,
-  useCallback,
   useContext,
   createContext,
   useEffect,
 } from "react";
+import { toast } from "react-toastify";
+import useFetchAPI from "./useFetchAPI";
 
 const SessionData = createContext({});
 
 export default function SessionProvider({ children }) {
-  const [token, setToken] = useState(0);
+  const [user, setUser] = useState();
+  const [fetchUser, userResponse] = useFetchAPI({ url: 'users', method: 'post' })
 
   useEffect(() => {
-    async function loadStoageData() {
-      const tmp = await localStorage.getItem("taskmanager:token");
-      const localToken = tmp !== null ? tmp : 0;
-      setToken(localToken);
+    async function loadStorageData() {
+      const tmp = await localStorage.getItem("taskmanager:user");
+      const localUser = tmp !== null ? tmp : undefined;
+      setUser(localUser);
     }
 
-    loadStoageData();
+    loadStorageData();
   }, []);
 
-  const signIn = useCallback(async () => {
-    try {
-      let currentToken = 1;
-      setToken(currentToken);
-      await localStorage.setItem("taskmanager:token", currentToken);
-    } catch (error) {
-      alert("Falha ao salvar token");
-    }
-  }, []);
+  useEffect(() => {
+    if (!userResponse) return
 
-  const signOut = useCallback(async () => {
-    try {
-      setToken(0);
-      await localStorage.removeItem("taskmanager:token");
-    } catch (error) {
-      alert("Falha ao remover token");
+    if (userResponse.success) {
+      setUser(userResponse.data)
+      localStorage.setItem("taskmanager:user", userResponse.data)
     }
-  }, []);
+    else
+      toast.error(userResponse.message)
+  }, [userResponse])
+
+  const signIn = (email, password) => {
+    fetchUser({ data: { email, password }, mockResponse: {
+      "id": 74,
+      "email": "fabio@lopes.dev",
+      "name": "Fabio Lopes",
+      "created_at": "2021-11-28T02:37:26.000Z",
+      "updated_at": "2021-11-28T02:37:26.000Z"
+    } })
+  }
+
+  const signOut = () => {
+    setUser(undefined);
+    localStorage.removeItem("taskmanager:user");
+  }
 
   return (
-    <SessionData.Provider value={{ token, signIn, signOut }}>
+    <SessionData.Provider value={{ user, signIn, signOut }}>
       {children}
     </SessionData.Provider>
   );

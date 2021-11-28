@@ -12,7 +12,7 @@ import './stylesheets/App.css';
 import { useSession } from "./contexts/useSession";
 
 function App() {
-  const { token } = useSession();
+  const { user } = useSession();
 
   // const onSuccessfulLogin = (user) => {
   //   setUser(user)
@@ -37,7 +37,7 @@ function App() {
 
   return (
     <div className="App">
-      {token ? TasksRoute() : LoginRoute()}
+      {user ? TasksRoute() : LoginRoute()}
       <ToastContainer />
     </div>
   );

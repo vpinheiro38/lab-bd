@@ -24,7 +24,7 @@ function Login({ onLogin }) {
       return
     }
 
-    signIn();
+    signIn(email, password);
   }
 
   const onClickToRegister = (event) => {
