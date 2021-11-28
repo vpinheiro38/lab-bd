@@ -10,8 +10,9 @@ import useFetchAPI from "./useFetchAPI";
 const SessionData = createContext({});
 
 export default function SessionProvider({ children }) {
-  const [user, setUser] = useState();
-  const [fetchUser, userResponse] = useFetchAPI({ url: 'users', method: 'post' })
+  const [user, setUser] = useState()
+  const [fetchUser, userResponse] = useFetchAPI({ url: 'users', method: 'get' })
+  const [fetchRegisterUser, registerUserResponse] = useFetchAPI({ url: 'users', method: 'post' })
 
   useEffect(() => {
     async function loadStorageData() {
@@ -34,6 +35,16 @@ export default function SessionProvider({ children }) {
       toast.error(userResponse.message)
   }, [userResponse])
 
+  const register = (name, email, password) => {
+    fetchRegisterUser({ data: { name, email, password }, mockResponse: {      
+      "id": 74,
+      "email": "fabio@lopes.dev",
+      "name": "Fabio Lopes",
+      "created_at": "2021-11-28T02:37:26.000Z",
+      "updated_at": "2021-11-28T02:37:26.000Z"
+    }})
+  }
+
   const signIn = (email, password) => {
     fetchUser({ data: { email, password }, mockResponse: {
       "id": 74,
@@ -41,7 +52,7 @@ export default function SessionProvider({ children }) {
       "name": "Fabio Lopes",
       "created_at": "2021-11-28T02:37:26.000Z",
       "updated_at": "2021-11-28T02:37:26.000Z"
-    } })
+    }})
   }
 
   const signOut = () => {
@@ -50,7 +61,7 @@ export default function SessionProvider({ children }) {
   }
 
   return (
-    <SessionData.Provider value={{ user, signIn, signOut }}>
+    <SessionData.Provider value={{ user, register, signIn, signOut }}>
       {children}
     </SessionData.Provider>
   );

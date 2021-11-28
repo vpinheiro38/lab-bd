@@ -21,7 +21,7 @@ function TaskPage({ taskId }) {
         <label className='input-container'>
           <input className="input" type="text" placeholder='Descrição' onChange={e => setDescription(e.target.value)} />
         </label>
-    </form>
+      </form>
     </Card>
   )
 }

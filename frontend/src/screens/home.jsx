@@ -20,8 +20,6 @@ const taskList = [
     priorityId: 2,
     userId: 1,
     tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
     ],
   },
   {
@@ -175,7 +173,7 @@ const tasksCompleted = [
     completedDate: undefined,
     priorityId: 0,
     userId: 1,
-    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
+    tags: []
   },
 ]
 

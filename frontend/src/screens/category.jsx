@@ -1,10 +1,12 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Card from "../components/card";
 import Icon from "../components/icon";
-import LinkButton from "../components/linkbutton";
-import "../stylesheets/home.css";
-
 import { useSession } from "../contexts/useSession";
+import "../stylesheets/home.css";
+import "../stylesheets/category.css"
+import useFetchAPI from "../contexts/useFetchAPI";
+import { toast } from "react-toastify";
 
 const taskList = [
   {
@@ -21,34 +23,71 @@ const taskList = [
   },
 ];
 
-function TagItem({ item, index, onEditItem, onExludeItem }) {
-  const [editable, setEditable] = useState(true);
+function TagItem({ item, onDeletedTag }) {
+  const [fetchEditCategory, editCategoryResponse] = useFetchAPI({ url: 'categories', method: 'put' })
+  const [fetchDeleteCategory, deleteCategoryResponse] = useFetchAPI({ url: `categories/${item.id}`, method: 'delete' })
+  const [editable, setEditable] = useState(false);
+  const [description, setDescription] = useState(item.description)
+
+  useEffect(() => {
+    if (!editCategoryResponse) return
+
+    if (editCategoryResponse.success) {
+      item.description = description
+      setEditable(false)
+      toast.success(editCategoryResponse.message)
+    } else {
+      toast.error(editCategoryResponse.message)
+    }    
+  }, [editCategoryResponse])
+
+  useEffect(() => {
+    if (!deleteCategoryResponse) return
+
+    if (deleteCategoryResponse.success) {
+      onDeletedTag(item)
+      toast.success(deleteCategoryResponse.message)
+    } else {
+      toast.error(deleteCategoryResponse.message)
+    }    
+  }, [deleteCategoryResponse])
+
+  const onEditTag = () => {
+    fetchEditCategory({ data: { ...item, description }, mockResponse: {...item, description}})
+  }
+
+  const onDeleteTag = () => {
+    fetchDeleteCategory({})
+  }
+
   return (
     <div key={item.id} className="task">
       <div className="text-container">
-        {!editable ? (
+        {editable ? (
           <input
-            className="text-container"
-            value={item.description}
-            onChange={(description) => onEditItem(index, description)}
+            className="input"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
           />
         ) : (
-          <p className="text">{item.description}</p>
+          <p className="text">{description}</p>
         )}
       </div>
       <div className="buttons">
-        {editable ? (
-          <Icon iconName="fa-edit" onClick={() => setEditable(false)} />
-        ) : (
-          <Icon iconName="fa-check" onClick={() => setEditable(true)} />
+        {editable && (
+          <Icon iconName='fa-check' onClick={onEditTag} />
         )}
-        <Icon iconName="fa-trash" onClick={() => onExludeItem(index)} />
+        <Icon
+          iconName={"fa-edit"}
+          onClick={() => setEditable(!editable)}
+        />
+        <Icon iconName="fa-trash" onClick={onDeleteTag} />
       </div>
     </div>
   );
 }
 
-function TagList({ itemList, onEditItem, onExludeItem }) {
+function TagList({ itemList, onDeletedTag }) {
   return (
     <div className="tasks-container">
       {itemList.length === 0 ? (
@@ -59,9 +98,7 @@ function TagList({ itemList, onEditItem, onExludeItem }) {
         itemList.map((item, index) => (
           <TagItem
             item={item}
-            onEditItem={onEditItem}
-            onExludeItem={onExludeItem}
-            index={index}
+            onDeletedTag={onDeletedTag}
           />
         ))
       )}
@@ -70,67 +107,75 @@ function TagList({ itemList, onEditItem, onExludeItem }) {
 }
 
 function CategoryScreen() {
-  const { signOut } = useSession();
-  const [tags, setTags] = useState([...taskList]);
-  const [newTag, setNewTag] = useState("");
+  const { user } = useSession();
+  const [fetchCategories, categoriesResponse] = useFetchAPI({ url: 'categories', method: 'get', disableSuccessNotification: true })
+  const [fetchAddCategory, addCategoryResponse] = useFetchAPI({ url: 'categories', method: 'post' })
+  const [addCategoryDescription, setAddCategoryDescription] = useState('')
+  const [tags, setTags] = useState([]);
 
-  const onExit = useCallback(() => signOut(), [signOut]);
+  useEffect(() => {
+    fetchCategories({ data: { user_id: user.id }, mockResponse: [...taskList]})
+  }, [user.id])
 
-  const handleNewTag = useCallback((event) => {
-    setNewTag(event.target.value);
-  }, []);
+  useEffect(() => {
+    if (!categoriesResponse) return
 
-  const onEditItem = useCallback(
-    (index, description) => {
-      const newArray = [...tags];
-      newArray[index] = { description: description.target.value };
-      setTags(newArray);
-    },
-    [tags]
-  );
+    if (categoriesResponse.success) {
+      setTags(categoriesResponse.data)
+    }
+  }, [categoriesResponse])
 
-  const onExludeItem = useCallback(
-    (index) => {
-      const newArray = tags.filter((_, tagItemIndex) => tagItemIndex !== index);
-      console.log(newArray, index);
-      setTags(newArray);
-    },
-    [tags]
-  );
+  useEffect(() => {
+    if (!addCategoryResponse) return
+    
+    if (addCategoryResponse.success) {
+      setTags(tags => [...tags, addCategoryResponse.data])
+    }
+  }, [addCategoryResponse])
 
-  const createNewItem = useCallback(() => {
-    const newArray = tags;
-    newArray.push({ id: tags.length, description: newTag });
-    setTags(newArray);
-    setNewTag("");
-  }, [tags, newTag]);
+  const createNewItem = (event) => {
+    event.preventDefault()
+    if (addCategoryDescription === '') {
+      toast.error('A categoria não pode ter descrição vazia')
+      return
+    }
 
+    fetchAddCategory({ data: { description: addCategoryDescription }, mockResponse: {
+      id: 5, description: addCategoryDescription
+    }})
+  }
+
+  const onDeletedTag = (tagItem) => {
+    setTags(tags => tags.filter(tag => tag.id !== tagItem.id))
+  }
+  
   return (
     <Card className="home-card">
       <div className="header">
         <h1 className="title">Lista de Categorias</h1>
         <div>
-          <LinkButton to="/routine" describe="Rotinas" />
-          <LinkButton to="/" describe="Tarefas" />
-          <button className="button" onClick={onExit}>
-            Sair
-          </button>
+          <Link to="/">
+            <button className="button">Voltar</button>
+          </Link>
         </div>
       </div>
-
-      <div className="add">
-        <input
-          className="text-container"
-          value={newTag}
-          onChange={handleNewTag}
-        />
-        <Icon iconName="fa-plus" onClick={createNewItem} />
+      <form className='form'>
+        <label className='add-category-input-container'>
+          <input
+            className="input add-category-input"
+            type="text"
+            placeholder='Descrição da Categoria'
+            onChange={e => setAddCategoryDescription(e.target.value)}
+          />
+          <button className="button is-primary" onClick={createNewItem}>Adicionar Categoria</button>
+        </label>
+      </form>
+      <div className='category-list'>        
+        <h2 className='subtitle'>Categorias criadas</h2>
       </div>
-
       <TagList
         itemList={tags}
-        onEditItem={onEditItem}
-        onExludeItem={onExludeItem}
+        onDeletedTag={onDeletedTag}
       />
     </Card>
   );
