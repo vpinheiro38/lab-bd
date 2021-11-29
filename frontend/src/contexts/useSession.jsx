@@ -4,14 +4,13 @@ import {
   createContext,
   useEffect,
 } from "react";
-import { toast } from "react-toastify";
 import useFetchAPI from "./useFetchAPI";
 
 const SessionData = createContext({});
 
 export default function SessionProvider({ children }) {
   const [user, setUser] = useState()
-  const [fetchUser, userResponse] = useFetchAPI({ url: 'users', method: 'get' })
+  const [fetchLoginUser, userLoginResponse] = useFetchAPI({ url: 'users/login', method: 'post' })
   const [fetchRegisterUser, registerUserResponse] = useFetchAPI({ url: 'users', method: 'post' })
 
   useEffect(() => {
@@ -25,34 +24,29 @@ export default function SessionProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    if (!userResponse) return
+    if (!userLoginResponse) return
 
-    if (userResponse.success) {
-      setUser(userResponse.data)
-      localStorage.setItem("taskmanager:user", userResponse.data)
+    if (userLoginResponse.success) {
+      setUser(userLoginResponse.data)
+      localStorage.setItem("taskmanager:user", userLoginResponse.data)
     }
-    else
-      toast.error(userResponse.message)
-  }, [userResponse])
+  }, [userLoginResponse])
+
+  useEffect(() => {
+    if (!registerUserResponse) return
+
+    if (registerUserResponse.success) {
+      setUser(registerUserResponse.data)
+      localStorage.setItem("taskmanager:user", registerUserResponse.data)
+    }
+  }, [registerUserResponse])
 
   const register = (name, email, password) => {
-    fetchRegisterUser({ data: { name, email, password }, mockResponse: {      
-      "id": 74,
-      "email": "fabio@lopes.dev",
-      "name": "Fabio Lopes",
-      "created_at": "2021-11-28T02:37:26.000Z",
-      "updated_at": "2021-11-28T02:37:26.000Z"
-    }})
+    fetchRegisterUser({ data: { name, email, password }, useAxios: true })
   }
 
   const signIn = (email, password) => {
-    fetchUser({ data: { email, password }, mockResponse: {
-      "id": 70,
-      "email": "fabio@lopes.dev",
-      "name": "Fabio Lopes",
-      "created_at": "2021-11-28T02:37:26.000Z",
-      "updated_at": "2021-11-28T02:37:26.000Z"
-    }})
+    fetchLoginUser({ data: { email, password }, useAxios: true })
   }
 
   const signOut = () => {
