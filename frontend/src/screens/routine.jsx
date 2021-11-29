@@ -173,7 +173,7 @@ function Screen() {
   return (
     <Card className="home-card">
       <div className="header">
-        <h1 className="title">Routina</h1>
+        <h1 className="title">Rotinas</h1>
         <div>
           <LinkButton to="/category" describe="Categorias" />
           <LinkButton to="/" describe="Tarefas" />

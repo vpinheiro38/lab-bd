@@ -5,10 +5,12 @@ import { Link } from "react-router-dom"
 function Task({ task, priorities, onCompleteTask, onDeleteTask }) {
 
   const PriorityTag = ({ priority }) => {
+    if (!priority) return <div/>
+
     const colors = ['is-success', 'is-warning', 'is-danger']
 
     return (
-      <span className={`tag ${colors[priority.numberPriority]}`}>
+      <span className={`tag ${priority.priority_number && colors[priority.priority_number]}`}>
         Prioridade: {priority.description}
       </span>
     )

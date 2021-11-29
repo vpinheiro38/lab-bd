@@ -9,15 +9,24 @@ export default function useFetchAPI({ url, method, disableSuccessNotification })
   const [response, setResponse] = useState()
   const [fetching, setFetching] = useState(false)
 
-  const fetchAPI = ({ data, mockResponse }) => {
-    // axios({
-    //   url: `localhost:3000/${url}`, method, data
-    // }).then((response) => {
-    //   setResponse(response)
-    //   setFetching(false)
-    // })
-    // setFetching(true)
-    setResponse({ message: 'Requisição mockada', success: true, data: mockResponse })
+  const fetchAPI = ({ data, useAxios, mockResponse }) => {
+    if (useAxios) {
+      axios({
+        url: `http://localhost:3001/${url}`, method, data,
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8',
+          'Access-Control-Allow-Origin': '*',
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+        }
+      }).then((response) => {
+        setResponse(response.data)
+        setFetching(false)
+      })
+      setFetching(true)
+    } else {
+      setResponse({ message: 'Requisição mockada', success: true, data: mockResponse })
+    }
+    
   }
 
   useEffect(() => {

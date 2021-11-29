@@ -1,0 +1,13 @@
+.row-container {
+  display: flex;
+  width: 100%;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.select {  
+  margin-right: 30px;
+}
