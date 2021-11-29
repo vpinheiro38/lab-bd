@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 var mysql = require('mysql2');
 
@@ -18,6 +19,19 @@ export class UsersService {
     const [results, fields] = await connection.promise().query(
       'CALL pr_user_insert(?,?,?,@message,@success); SELECT @message,@success',
       [createUserDto.name,createUserDto.email,createUserDto.password],
+    );
+    if(results[1][0]['@success'] > 0){
+      const user = await this.findOne(results[1][0]['@success']);
+      return {message: results[1][0]['@message'], success: !!results[1][0]['@success'], data: user };
+    }
+    return {message: results[1][0]['@message'], success: !!results[1][0]['@success'] };
+  }
+
+  async login(loginUserDto: LoginUserDto) {
+    connection.connect();
+    const [results, fields] = await connection.promise().query(
+      'CALL pr_login(?,?,@message,@success); SELECT @message,@success',
+      [loginUserDto.email,loginUserDto.password],
     );
     if(results[1][0]['@success'] > 0){
       const user = await this.findOne(results[1][0]['@success']);

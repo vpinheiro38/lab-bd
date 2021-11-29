@@ -26,6 +26,15 @@ let UsersService = class UsersService {
         }
         return { message: results[1][0]['@message'], success: !!results[1][0]['@success'] };
     }
+    async login(loginUserDto) {
+        connection.connect();
+        const [results, fields] = await connection.promise().query('CALL pr_login(?,?,@message,@success); SELECT @message,@success', [loginUserDto.email, loginUserDto.password]);
+        if (results[1][0]['@success'] > 0) {
+            const user = await this.findOne(results[1][0]['@success']);
+            return { message: results[1][0]['@message'], success: !!results[1][0]['@success'], data: user };
+        }
+        return { message: results[1][0]['@message'], success: !!results[1][0]['@success'] };
+    }
     findAll() {
         return `This action returns all users`;
     }

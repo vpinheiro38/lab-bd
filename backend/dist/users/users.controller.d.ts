@@ -29,6 +29,31 @@ export declare class UsersController {
         success: boolean;
         data?: undefined;
     }>;
+    createQualquercoisa(createUserDto: CreateUserDto): Promise<{
+        message: any;
+        success: boolean;
+        data: {
+            id: any;
+            email: any;
+            name: any;
+            created_at: any;
+            updated_at: any;
+            success?: undefined;
+            message?: undefined;
+        } | {
+            success: boolean;
+            message: string;
+            id?: undefined;
+            email?: undefined;
+            name?: undefined;
+            created_at?: undefined;
+            updated_at?: undefined;
+        };
+    } | {
+        message: any;
+        success: boolean;
+        data?: undefined;
+    }>;
     findAll(): string;
     findOne(id: string): Promise<{
         id: any;
