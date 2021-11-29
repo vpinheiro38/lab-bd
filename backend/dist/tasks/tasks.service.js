@@ -30,15 +30,18 @@ let TasksService = class TasksService {
         connection.connect();
         const queries = [];
         const params = [];
+        let completed_tasks = false;
         if (!!user) {
             queries.push(' user_id = ? ');
             params.push(user);
         }
         if (completed && completed === 'false') {
             queries.push(' completed_at IS NULL ');
+            completed_tasks = false;
         }
-        else if (completed && completed === 'true') {
+        else {
             queries.push(' completed_at IS NOT NULL ');
+            completed_tasks = true;
         }
         if (!!category) {
             queries.push(' category_task_category_id IN (?) ');
@@ -49,7 +52,7 @@ let TasksService = class TasksService {
             params.push(JSON.parse(priority));
         }
         connection.connect();
-        const [results, fields] = await connection.promise().query('SELECT * from vw_tasks WHERE ' + queries.join(' and '), params);
+        const [results, fields] = await connection.promise().query('SELECT * from vw_tasks WHERE ' + queries.join(' and ') + (completed_tasks ? ' ORDER BY completed_at ASC' : 'task_priority DESC, deadline_at DESC, created_at ASC'), params);
         if (results.length > 0) {
             return { succes: true, message: 'tasks encontradas', data: results };
         }
