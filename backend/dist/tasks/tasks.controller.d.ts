@@ -43,7 +43,17 @@ export declare class TasksController {
         success: boolean;
         data?: undefined;
     }>;
-    findAll(): string;
+    findAll(user: string, completed: string, category: any, priority: string): Promise<{
+        succes: boolean;
+        message: string;
+        data: any;
+        success?: undefined;
+    } | {
+        success: boolean;
+        message: string;
+        succes?: undefined;
+        data?: undefined;
+    }>;
     findOne(id: string): Promise<{
         user_name: any;
         priority_id: any;

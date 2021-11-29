@@ -24,8 +24,8 @@ let TasksController = class TasksController {
     create(createTaskDto) {
         return this.tasksService.create(createTaskDto);
     }
-    findAll() {
-        return this.tasksService.findAll();
+    findAll(user, completed, category, priority) {
+        return this.tasksService.findAll(user, completed, category, priority);
     }
     findOne(id) {
         return this.tasksService.findOne(+id);
@@ -46,8 +46,12 @@ __decorate([
 ], TasksController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)('user')),
+    __param(1, (0, common_1.Query)('completed')),
+    __param(2, (0, common_1.Query)('category')),
+    __param(3, (0, common_1.Query)('priority')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String, String, Object, String]),
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "findAll", null);
 __decorate([

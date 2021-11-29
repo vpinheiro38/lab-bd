@@ -26,8 +26,39 @@ export class TasksService {
     return {message: results[1][0]['@message'], success: !!results[1][0]['@success'] };
   }
 
-  findAll() {
-    return `This action returns all tasks`;
+  async findAll(user:string,completed:string,category:string,priority:string) {
+    connection.connect();
+    const queries = [];
+    const params = [];
+    if(!!user){
+      queries.push(' user_id = ? ');
+      params.push(user);
+    }
+    if(completed && completed === 'false'){
+
+      queries.push(' completed_at IS NULL ');
+    }else{
+      queries.push(' completed_at IS NOT NULL ');
+    }
+    if(!!category){
+      queries.push(' category_task_category_id IN (?) ');
+      params.push(JSON.parse(category));
+    }
+    if(!!priority){
+      queries.push(' task_priority IN (?) ');
+      params.push(JSON.parse(priority));
+    }
+
+    connection.connect();
+    //return  {frase: 'SELECT * from vw_tasks WHERE ' + queries.join(' and '), params}
+    const [results, fields] = await connection.promise().query(
+      'SELECT * from vw_tasks WHERE ' + queries.join(' and '), params
+    );
+    if(results.length > 0 ){
+      return {succes:true, message: 'tasks encontradas', data: results};
+    }else{
+      return {success: false, message: 'tasks não encontradas'};
+    }
   }
 
   async findOne(identificador: number) {
