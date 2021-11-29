@@ -9,6 +9,7 @@ import Task from "../components/task";
 import { Link } from "react-router-dom";
 
 import { useSession } from "../contexts/useSession";
+import useFetchAPI from "../contexts/useFetchAPI";
 
 const taskList = [
   {
@@ -184,6 +185,8 @@ const prioritiesList = [
 ]
 
 function Home() {
+  const [fetchPriorities, prioritiesResponse] = useFetchAPI({ url: 'priorities', method: 'get', disableSuccessNotification: true })
+
   const [renderCompleted, setRenderCompleted] = useState(false)
   const [completedTasks, setCompletedTasks] = useState([])
   const [incompletedTasks, setIncompletedTasks] = useState([])
@@ -242,8 +245,17 @@ function Home() {
   }, [])
 
   useEffect(() => {
-    setPriorities(prioritiesList)
+    fetchPriorities({ useAxios: true })
   }, [])
+
+  useEffect(() => {
+    if (!prioritiesResponse) return
+
+    if (prioritiesResponse.success) {
+      const priorityList = prioritiesResponse.data
+      setPriorities(priorityList)
+    }
+  }, [prioritiesResponse])
 
   useEffect(() => {
     setCategories([])

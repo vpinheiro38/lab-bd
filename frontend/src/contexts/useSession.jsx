@@ -47,7 +47,7 @@ export default function SessionProvider({ children }) {
 
   const signIn = (email, password) => {
     fetchUser({ data: { email, password }, mockResponse: {
-      "id": 74,
+      "id": 70,
       "email": "fabio@lopes.dev",
       "name": "Fabio Lopes",
       "created_at": "2021-11-28T02:37:26.000Z",
