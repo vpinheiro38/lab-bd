@@ -27,8 +27,23 @@ export class CategoriesTasksService {
   }
   
 
-  findAll() {
-    return `This action returns all categoriesTasks`;
+  async findAll(task:string) {
+    connection.connect();
+    const queries = [];
+    const params = [];
+    if(!!task){
+      queries.push(' task_id = ? ');
+      params.push(task);
+    }
+    connection.connect();
+    const [results, fields] = await connection.promise().query(
+      'SELECT * from vw_categories_tasks WHERE ' + queries.join(' and '), params
+    );
+    if(results.length > 0 ){
+      return {succes:true, message: 'categorias de tasks encontradas', data: results};
+    }else{
+      return {success: false, message: 'categorias de tasks não encontradas'};
+    }
   }
 
   async findOne(identificador: number) {
