@@ -21,7 +21,7 @@ export class TasksService {
     );
     if(results[1][0]['@success'] > 0){
       const task = await this.findOne(results[1][0]['@success']);
-      return {message: results[1][0]['@message'], success: !!results[1][0]['@success'], data: task };
+      return {message: results[1][0]['@message'], success: results[1][0]['@success'], data: task };
     }
     return {message: results[1][0]['@message'], success: !!results[1][0]['@success'] };
   }
@@ -53,7 +53,7 @@ export class TasksService {
 
     connection.connect();
     const [results, fields] = await connection.promise().query(
-      'SELECT * from vw_tasks WHERE ' + queries.join(' and ') + (completed_tasks?' ORDER BY completed_at ASC': 'task_priority DESC, deadline_at DESC, created_at ASC'), params
+      'SELECT * from vw_tasks WHERE ' + queries.join(' and ') + (completed_tasks?' ORDER BY completed_at ASC': ' ORDER BY task_priority DESC, deadline_at DESC, created_at ASC'), params
     );
     if(results.length > 0 ){
       return {succes:true, message: 'tasks encontradas', data: results};
@@ -68,8 +68,7 @@ export class TasksService {
       'SELECT * from vw_tasks WHERE id = ? LIMIT 1',[identificador]
     );
     if(!!results[0]){
-      const { user_name, priority_id, priority_description, priority_number, id, description, completed_at,deadline_at, task_priority, task_user, created_at, updated_at, user_email} = results[0]
-      return { user_name, priority_id, priority_description, priority_number, id, description, completed_at, deadline_at, task_priority, task_user, created_at, updated_at, user_email};
+      return {succes:true, message: 'task encontrada', data: results[0]};
     }else{
       return {success: false, message: 'task não encontrada'};
     }

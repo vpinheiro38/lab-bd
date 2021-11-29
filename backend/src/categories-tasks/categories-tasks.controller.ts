@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { CategoriesTasksService } from './categories-tasks.service';
 import { CreateCategoriesTaskDto } from './dto/create-categories-task.dto';
 import { UpdateCategoriesTaskDto } from './dto/update-categories-task.dto';
@@ -13,8 +13,8 @@ export class CategoriesTasksController {
   }
 
   @Get()
-  findAll() {
-    return this.categoriesTasksService.findAll();
+  findAll(@Query('task') task: string) {
+    return this.categoriesTasksService.findAll(task);
   }
 
   @Get(':id')

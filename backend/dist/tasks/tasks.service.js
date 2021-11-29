@@ -19,10 +19,10 @@ const connection = mysql.createConnection({
 let TasksService = class TasksService {
     async create(createTaskDto) {
         connection.connect();
-        const [results, fields] = await connection.promise().query('CALL pr_task_insert(?,?,?,?,@message,@success); SELECT @message,@success', [createTaskDto.description, createTaskDto.completed, createTaskDto.task_priority, createTaskDto.task_user]);
+        const [results, fields] = await connection.promise().query('CALL pr_task_insert(?,?,?,?,?,@message,@success); SELECT @message,@success', [createTaskDto.description, createTaskDto.completed_at, createTaskDto.deadline_at, createTaskDto.task_priority, createTaskDto.task_user]);
         if (results[1][0]['@success'] > 0) {
             const task = await this.findOne(results[1][0]['@success']);
-            return { message: results[1][0]['@message'], success: !!results[1][0]['@success'], data: task };
+            return { message: results[1][0]['@message'], success: results[1][0]['@success'], data: task };
         }
         return { message: results[1][0]['@message'], success: !!results[1][0]['@success'] };
     }
@@ -52,7 +52,7 @@ let TasksService = class TasksService {
             params.push(JSON.parse(priority));
         }
         connection.connect();
-        const [results, fields] = await connection.promise().query('SELECT * from vw_tasks WHERE ' + queries.join(' and ') + (completed_tasks ? ' ORDER BY completed_at ASC' : 'task_priority DESC, deadline_at DESC, created_at ASC'), params);
+        const [results, fields] = await connection.promise().query('SELECT * from vw_tasks WHERE ' + queries.join(' and ') + (completed_tasks ? ' ORDER BY completed_at ASC' : ' ORDER BY task_priority DESC, deadline_at DESC, created_at ASC'), params);
         if (results.length > 0) {
             return { succes: true, message: 'tasks encontradas', data: results };
         }
@@ -64,8 +64,7 @@ let TasksService = class TasksService {
         connection.connect();
         const [results, fields] = await connection.promise().query('SELECT * from vw_tasks WHERE id = ? LIMIT 1', [identificador]);
         if (!!results[0]) {
-            const { user_name, priority_id, priority_description, priority_number, id, description, completed, task_priority, task_user, created_at, updated_at, user_email } = results[0];
-            return { user_name, priority_id, priority_description, priority_number, id, description, completed, task_priority, task_user, created_at, updated_at, user_email };
+            return { succes: true, message: 'task encontrada', data: results[0] };
         }
         else {
             return { success: false, message: 'task não encontrada' };
@@ -73,7 +72,7 @@ let TasksService = class TasksService {
     }
     async update(id, updateTaskDto) {
         connection.connect();
-        const [results, fields] = await connection.promise().query('CALL pr_task_update(?,?,?,?,?,@message,@success); SELECT @message,@success', [id, updateTaskDto.description, updateTaskDto.completed, updateTaskDto.task_priority, updateTaskDto.task_user]);
+        const [results, fields] = await connection.promise().query('CALL pr_task_update(?,?,?,?,?,?,@message,@success); SELECT @message,@success', [id, updateTaskDto.description, updateTaskDto.completed_at, updateTaskDto.deadline_at, updateTaskDto.task_priority, updateTaskDto.task_user]);
         if (results[1][0]['@success'] > 0) {
             const task = await this.findOne(results[1][0]['@success']);
             return { message: results[1][0]['@message'], success: !!results[1][0]['@success'], data: task };
