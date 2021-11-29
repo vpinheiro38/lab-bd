@@ -37,7 +37,7 @@ let TasksService = class TasksService {
         if (completed && completed === 'false') {
             queries.push(' completed_at IS NULL ');
         }
-        else {
+        else if (completed && completed === 'true') {
             queries.push(' completed_at IS NOT NULL ');
         }
         if (!!category) {
