@@ -27,8 +27,24 @@ export class CategoriesService {
     return {message: results[1][0]['@message'], success: !!results[1][0]['@success'] };
   }
 
-  findAll() {
-    return `This action returns all categories`;
+  async findAll(user:string) {
+    connection.connect();
+    const queries = [];
+    const params = [];
+    if(!!user){
+      queries.push('WHERE user_id = ? ');
+      params.push(user);
+    }
+
+    connection.connect();
+    const [results, fields] = await connection.promise().query(
+      'SELECT * from vw_tasks ' + queries.join(' and '), params
+    );
+    if(results.length > 0 ){
+      return {succes:true, message: 'categorias encontradas', data: results};
+    }else{
+      return {success: false, message: 'categorias não encontradas'};
+    }
   }
 
   async findOne(identificador: number) {
