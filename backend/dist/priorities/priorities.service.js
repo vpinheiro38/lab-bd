@@ -19,7 +19,7 @@ const connection = mysql.createConnection({
 let PrioritiesService = class PrioritiesService {
     async create(createPriorityDto) {
         connection.connect();
-        const [results, fields] = await connection.promise().query('CALL pr_priority_insert(?,?,@message,@success); SELECT @message,@success', [createPriorityDto.description, createPriorityDto.number_priority]);
+        const [results, fields] = await connection.promise().query('CALL pr_priority_insert(?,?,@message,@success); SELECT @message,@success', [createPriorityDto.description, createPriorityDto.priority_number]);
         if (results[1][0]['@success'] > 0) {
             const user = await this.findOne(results[1][0]['@success']);
             return { message: results[1][0]['@message'], success: !!results[1][0]['@success'], data: user };

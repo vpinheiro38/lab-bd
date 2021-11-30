@@ -17,7 +17,7 @@ export class PrioritiesService {
     connection.connect();
     const [results, fields] = await connection.promise().query(
       'CALL pr_priority_insert(?,?,@message,@success); SELECT @message,@success',
-      [createPriorityDto.description, createPriorityDto.number_priority],
+      [createPriorityDto.description, createPriorityDto.priority_number],
     );
     if(results[1][0]['@success'] > 0){
       const user = await this.findOne(results[1][0]['@success']);

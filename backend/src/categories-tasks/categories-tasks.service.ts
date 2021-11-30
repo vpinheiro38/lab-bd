@@ -49,7 +49,7 @@ export class CategoriesTasksService {
   async findOne(identificador: number) {
     connection.connect();
     const [results, fields] = await connection.promise().query(
-      'SELECT * from vw_category_task WHERE id = ? LIMIT 1',[identificador]
+      'SELECT * from vw_categories_tasks WHERE id = ? LIMIT 1',[identificador]
     );
     if(!!results[0]){
       const { id,category_id,category_description,task_id,task_description,task_completed} = results[0]

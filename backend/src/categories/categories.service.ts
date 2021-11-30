@@ -38,7 +38,7 @@ export class CategoriesService {
 
     connection.connect();
     const [results, fields] = await connection.promise().query(
-      'SELECT * from vw_tasks ' + queries.join(' and '), params
+      'SELECT * from vw_categories ' + queries.join(' and '), params
     );
     if(results.length > 0 ){
       return {succes:true, message: 'categorias encontradas', data: results};
