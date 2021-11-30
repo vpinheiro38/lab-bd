@@ -5,14 +5,12 @@ export declare class TasksService {
         message: any;
         success: any;
         data: {
-            succes: boolean;
+            success: boolean;
             message: string;
             data: any;
-            success?: undefined;
         } | {
             success: boolean;
             message: string;
-            succes?: undefined;
             data?: undefined;
         };
     } | {
@@ -21,39 +19,33 @@ export declare class TasksService {
         data?: undefined;
     }>;
     findAll(user: string, completed: string, category: string, priority: string): Promise<{
-        succes: boolean;
+        success: boolean;
         message: string;
         data: any;
-        success?: undefined;
     } | {
         success: boolean;
         message: string;
-        succes?: undefined;
         data?: undefined;
     }>;
     findOne(identificador: number): Promise<{
-        succes: boolean;
+        success: boolean;
         message: string;
         data: any;
-        success?: undefined;
     } | {
         success: boolean;
         message: string;
-        succes?: undefined;
         data?: undefined;
     }>;
     update(id: number, updateTaskDto: UpdateTaskDto): Promise<{
         message: any;
         success: boolean;
         data: {
-            succes: boolean;
+            success: boolean;
             message: string;
             data: any;
-            success?: undefined;
         } | {
             success: boolean;
             message: string;
-            succes?: undefined;
             data?: undefined;
         };
     } | {

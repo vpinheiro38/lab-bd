@@ -12,7 +12,7 @@ function Dropdown({ title, type, options, onFilter }) {
     setSelected(selectedOptions)
     onFilter(selectedOptions)
   }
-
+  console.log(options)
   return (
     <div className="dropdown is-hoverable">
       <div className="dropdown-trigger">

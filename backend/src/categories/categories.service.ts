@@ -41,7 +41,7 @@ export class CategoriesService {
       'SELECT * from vw_categories ' + queries.join(' and '), params
     );
     if(results.length > 0 ){
-      return {succes:true, message: 'categorias encontradas', data: results};
+      return {success:true, message: 'categorias encontradas', data: results};
     }else{
       return {success: false, message: 'categorias não encontradas'};
     }

@@ -8,14 +8,12 @@ export declare class TasksController {
         message: any;
         success: any;
         data: {
-            succes: boolean;
+            success: boolean;
             message: string;
             data: any;
-            success?: undefined;
         } | {
             success: boolean;
             message: string;
-            succes?: undefined;
             data?: undefined;
         };
     } | {
@@ -24,39 +22,33 @@ export declare class TasksController {
         data?: undefined;
     }>;
     findAll(user: string, completed: string, category: any, priority: string): Promise<{
-        succes: boolean;
+        success: boolean;
         message: string;
         data: any;
-        success?: undefined;
     } | {
         success: boolean;
         message: string;
-        succes?: undefined;
         data?: undefined;
     }>;
     findOne(id: string): Promise<{
-        succes: boolean;
+        success: boolean;
         message: string;
         data: any;
-        success?: undefined;
     } | {
         success: boolean;
         message: string;
-        succes?: undefined;
         data?: undefined;
     }>;
     update(id: string, updateTaskDto: UpdateTaskDto): Promise<{
         message: any;
         success: boolean;
         data: {
-            succes: boolean;
+            success: boolean;
             message: string;
             data: any;
-            success?: undefined;
         } | {
             success: boolean;
             message: string;
-            succes?: undefined;
             data?: undefined;
         };
     } | {

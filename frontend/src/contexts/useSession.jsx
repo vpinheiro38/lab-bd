@@ -15,7 +15,7 @@ export default function SessionProvider({ children }) {
 
   useEffect(() => {
     async function loadStorageData() {
-      const tmp = await localStorage.getItem("taskmanager:user");
+      const tmp = JSON.parse(localStorage.getItem("taskmanager:user"));
       const localUser = tmp !== null ? tmp : undefined;
       setUser(localUser);
     }

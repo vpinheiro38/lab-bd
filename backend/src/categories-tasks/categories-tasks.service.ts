@@ -40,7 +40,7 @@ export class CategoriesTasksService {
       'SELECT * from vw_categories_tasks WHERE ' + queries.join(' and '), params
     );
     if(results.length > 0 ){
-      return {succes:true, message: 'categorias de tasks encontradas', data: results};
+      return {success:true, message: 'categorias de tasks encontradas', data: results};
     }else{
       return {success: false, message: 'categorias de tasks não encontradas'};
     }

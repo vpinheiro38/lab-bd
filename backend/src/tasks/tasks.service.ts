@@ -56,7 +56,7 @@ export class TasksService {
       'SELECT * from vw_tasks WHERE ' + queries.join(' and ') + (completed_tasks?' ORDER BY completed_at ASC': ' ORDER BY task_priority DESC, deadline_at DESC, created_at ASC'), params
     );
     if(results.length > 0 ){
-      return {succes:true, message: 'tasks encontradas', data: results};
+      return {success:true, message: 'tasks encontradas', data: results};
     }else{
       return {success: false, message: 'tasks não encontradas'};
     }
@@ -68,7 +68,7 @@ export class TasksService {
       'SELECT * from vw_tasks WHERE id = ? LIMIT 1',[identificador]
     );
     if(!!results[0]){
-      return {succes:true, message: 'task encontrada', data: results[0]};
+      return {success:true, message: 'task encontrada', data: results[0]};
     }else{
       return {success: false, message: 'task não encontrada'};
     }

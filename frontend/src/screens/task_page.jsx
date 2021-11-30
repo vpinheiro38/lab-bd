@@ -32,7 +32,7 @@ function TaskPage({ taskId }) {
   useEffect(() => {
     fetchPriorities({ useAxios: true })
   }, [])
-
+  console.log(user)
   useEffect(() => {
     if (!prioritiesResponse) return
 
@@ -44,7 +44,10 @@ function TaskPage({ taskId }) {
   }, [prioritiesResponse])
 
   useEffect(() => {
-    fetchCategories({ data: { user_id: user.id }, mockResponse: []})
+    fetchCategories({
+      queries: [`user=${user.id}`],
+      useAxios: true
+    })
   }, [user.id])
 
   useEffect(() => {
@@ -163,11 +166,11 @@ function TaskPage({ taskId }) {
               </select>
             </div>
           </Field>
-          <Field label='Categorias'>          
+          <Field label='Categorias'>
             <Dropdown
               type='category'
               title='Categorias'
-              options={[]}
+              options={categories}
               onFilter={[]}
             />
           </Field>
