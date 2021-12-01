@@ -5,14 +5,14 @@ import {
 import axios from 'axios'
 import { toast } from "react-toastify"
 
-export default function useFetchAPI({ url, method, disableSuccessNotification }) {
+export default function useFetchAPI({ url, method, disableNotifications, disableSuccessNotification }) {
   const [response, setResponse] = useState()
   const [fetching, setFetching] = useState(false)
 
-  const fetchAPI = ({ data, queries, useAxios, mockResponse }) => {
+  const fetchAPI = ({ data, extraPath = '', queries, useAxios, mockResponse }) => {
     if (useAxios) {
       const urlQuery = queries ? `?${queries.join('&')}` : ''
-      const axiosUrl = `http://localhost:3001/${url}${urlQuery}`
+      const axiosUrl = `http://localhost:3001/${url}${extraPath}${urlQuery}`
 
       axios({
         url: axiosUrl, method, data,
@@ -33,11 +33,11 @@ export default function useFetchAPI({ url, method, disableSuccessNotification })
   }
 
   useEffect(() => {
-    if (!response) return
+    if (!response || disableNotifications) return
 
     if (!disableSuccessNotification && response.success) toast.success(response.message)
     else if (!response.success) toast.error(response.message)
-  }, [response])
+  }, [response, disableNotifications, disableSuccessNotification])
 
   return [fetchAPI, response]
 }
