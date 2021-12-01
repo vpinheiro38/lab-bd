@@ -55,7 +55,9 @@ function Task({ task, onCompleteTask, onDeleteTask }) {
         <p className='text'>{task.description}</p>
       </div>
       <div className='buttons'>
-        <Icon iconName='fa-check'
+        <Icon
+          iconType={task.completed_at ? 'fa' : 'far'}
+          iconName='fa-check-square'
           onClick={() => onCompleteTask(task, task.completed_at ? null : (new Date()).toJSON().slice(0, -1))}
         />
         <Link to={`/task/${task.id}`}>
