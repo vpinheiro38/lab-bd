@@ -2,7 +2,8 @@ import { Link } from "react-router-dom"
 import Card from "../components/card";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"
-import DatePicker from "react-datepicker"
+import DatePicker, { registerLocale } from "react-datepicker"
+import ptBR from 'date-fns/locale/pt-BR';
 import '../stylesheets/components.css'
 import '../stylesheets/task.css'
 import Dropdown from "../components/dropdown";
@@ -10,6 +11,8 @@ import { isStringEmpty } from "../utils/utils";
 import { toast } from "react-toastify";
 import useFetchAPI from "../contexts/useFetchAPI";
 import { useSession } from "../contexts/useSession";
+
+registerLocale('ptBR', ptBR)
 
 function TaskPage({ taskId }) {
   const { user } = useSession()
@@ -19,6 +22,7 @@ function TaskPage({ taskId }) {
   const [fetchCategories, categoriesResponse] = useFetchAPI({ url: 'categories', method: 'get', disableSuccessNotification: true })
   const [fetchGetTask, getTaskResponse] = useFetchAPI({ url: `tasks/${taskId}`, method: 'get', disableSuccessNotification: true })
   const [fetchTask, taskResponse] = useFetchAPI({ url: taskId ? `tasks/${taskId}` : 'tasks', method: taskId ? 'put' : 'post' })
+  const [fetchCategoryTask, categoryTaskResponse] = useFetchAPI({ url: 'categories-tasks', method: 'post' })
   
   const [priorities, setPriorities] = useState([])
   const [categories, setCategories] = useState([])
@@ -26,37 +30,95 @@ function TaskPage({ taskId }) {
   const [editingTask, setEditingTask] = useState()
   const [description, setDescription] = useState('')
   const [deadline, setDeadline] = useState();
-  const [taskPriority, setTaskPriority] = useState()
-  const [taskCategories, setTaskCategories] = useState([])
+  const [taskPriority, setTaskPriority] = useState({})
+  const [taskCategory, setTaskCategory] = useState({})
+
+  const onFilterCategories = (selectedCategories) => {
+    if (selectedCategories.length > 0) setTaskCategory(selectedCategories[0])
+    else setTaskCategory({})
+  }
+
+  const onChangePriority = (e) => {
+    const selectedOptions = priorities.filter((_, index) => {
+      return e.target[index].selected
+    })
+
+    if (selectedOptions.length > 0)
+      setTaskPriority(selectedOptions[0])
+  }
+
+  const onAddTask = (e) => {
+    const fixDeadlineTime = (datetime) => {
+      const deadline_at = new Date(datetime)
+      deadline_at.setHours(deadline_at.getHours() - 3)
+      return deadline_at.toJSON().slice(0, -1)
+    }
+
+    e.preventDefault()
+    if (isStringEmpty(description) || !taskPriority || !taskCategory) {
+      toast.error("Algum campo está vazio!")
+      return
+    }
+    
+    if (deadline) {
+    }
+
+    fetchTask({ 
+      data: {
+        description: description,
+        completed_at: editingTask ? editingTask.completed_at : null,
+        deadline_at: deadline ? fixDeadlineTime(deadline) : null,
+        task_priority: taskPriority.id,
+        task_user: user.id
+      },
+      useAxios: true
+    })
+
+    // fetchCategoryTask({
+    //   data: {
+    //     category_id: taskCategory.id,
+    //     task_id: 
+    //   },
+    //   useAxios: true
+    // })
+  }
+
+  const Field = ({ label, children }) => (
+    <label className='input-container'>
+      <div className="field-label">
+        <p className="label">{label}</p>
+      </div>
+      {children}
+    </label>
+  )
 
   useEffect(() => {
     fetchPriorities({ useAxios: true })
-  }, [])
-  console.log(user)
-  useEffect(() => {
-    if (!prioritiesResponse) return
-
-    if (prioritiesResponse.success) {
-      const priorityList = prioritiesResponse.data
-      setPriorities(priorityList)
-      setTaskPriority(prioritiesResponse.data[0])
-    }
-  }, [prioritiesResponse])
-
-  useEffect(() => {
+    
     fetchCategories({
       queries: [`user=${user.id}`],
       useAxios: true
     })
-  }, [user.id])
+  }, [])
+
+  useEffect(() => {
+    if (!prioritiesResponse) return
+    if (prioritiesResponse.success) {
+      const priorityList = prioritiesResponse.data
+      setPriorities(priorityList)
+      if (!taskId) setTaskPriority(priorityList[0])
+    }
+  }, [prioritiesResponse])
 
   useEffect(() => {
     if (!categoriesResponse) return
-
-    if (categoriesResponse.success) {
-      setCategories(categoriesResponse.data)
-    }
+    if (categoriesResponse.success) setCategories(categoriesResponse.data)
   }, [categoriesResponse])
+
+  useEffect(() => {
+    if (!taskResponse) return
+    if (taskResponse.success) navigate('/')
+  }, [taskResponse])
 
   useEffect(() => {
     if (!taskId || priorities.length === 0) return
@@ -88,52 +150,7 @@ function TaskPage({ taskId }) {
       setTaskPriority(priorities.filter(item => item.id === editTask.task_priority)[0])
     }
   }, [getTaskResponse])
-
-  useEffect(() => {
-    if (!taskResponse) return
-
-    if (taskResponse.success) {
-      navigate('/')
-    }
-  }, [taskResponse])
-
-  const Field = ({ label, children }) => (
-    <label className='input-container'>
-      <div className="field-label">
-        <p className="label">{label}</p>
-      </div>
-      {children}
-    </label>
-  )
-
-  const onFilterCategories = (selectedCategories) => {
-    setTaskCategories(selectedCategories)
-  }
-
-  const onChangePriority = (e) => {
-    const selectedOptions = priorities.filter((_, index) => {
-      return e.target[index].selected
-    })
-
-    if (selectedOptions.length > 0)
-      setTaskPriority(selectedOptions[0])
-  }
-
-  const onAddTask = (e) => {
-    e.preventDefault()
-    if (isStringEmpty(description) || !deadline || !taskPriority) {
-      toast.error("Algum campo está vazio!")
-      return
-    }
-
-    fetchTask({ data: {
-      description: description,
-      completed: editingTask ? editingTask.completed : false,
-      task_priority: taskPriority.id,
-      task_user: user.id
-    }})
-  }
-
+  console.log(deadline)
   return (
     <Card className='home-card'>
       <div className='header'>
@@ -171,12 +188,18 @@ function TaskPage({ taskId }) {
               type='category'
               title='Categorias'
               options={categories}
-              onFilter={[]}
+              onFilter={onFilterCategories}
             />
           </Field>
         </div>          
         <Field label='Prazo (opcional)'>
-          <DatePicker selected={deadline} onChange={(date) => setDeadline(date)} className='input' />
+          <DatePicker
+            selected={deadline}
+            onChange={(date) => setDeadline(date)}
+            className='input'
+            showTimeSelect
+            locale="ptBR"
+          />
         </Field>
       </form>
     </Card>

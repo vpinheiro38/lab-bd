@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Card from "../components/card";
 import Icon from "../components/icon";
 import { useSession } from "../contexts/useSession";
@@ -8,24 +8,12 @@ import "../stylesheets/category.css"
 import useFetchAPI from "../contexts/useFetchAPI";
 import { toast } from "react-toastify";
 
-const taskList = [
-  {
-    id: 0,
-    description: "Descrição da Tarefa",
-  },
-  {
-    id: 1,
-    description: "Descrição da Tarefa",
-  },
-  {
-    id: 2,
-    description: "Descrição da Tarefa",
-  },
-];
+function TagItem({ item, onEditedCategory, onDeletedTag }) {
+  const { user } = useSession();
 
-function TagItem({ item, onDeletedTag }) {
   const [fetchEditCategory, editCategoryResponse] = useFetchAPI({ url: 'categories', method: 'put' })
-  const [fetchDeleteCategory, deleteCategoryResponse] = useFetchAPI({ url: `categories/${item.id}`, method: 'delete' })
+  const [fetchDeleteCategory, deleteCategoryResponse] = useFetchAPI({ url: 'categories', method: 'delete' })
+
   const [editable, setEditable] = useState(false);
   const [description, setDescription] = useState(item.description)
 
@@ -33,32 +21,25 @@ function TagItem({ item, onDeletedTag }) {
     if (!editCategoryResponse) return
 
     if (editCategoryResponse.success) {
-      item.description = description
       setEditable(false)
-      toast.success(editCategoryResponse.message)
-    } else {
-      toast.error(editCategoryResponse.message)
-    }    
+      onEditedCategory()
+    }
   }, [editCategoryResponse])
 
   useEffect(() => {
     if (!deleteCategoryResponse) return
-
-    if (deleteCategoryResponse.success) {
-      onDeletedTag(item)
-      toast.success(deleteCategoryResponse.message)
-    } else {
-      toast.error(deleteCategoryResponse.message)
-    }    
+    if (deleteCategoryResponse.success) onDeletedTag()
   }, [deleteCategoryResponse])
 
   const onEditTag = () => {
-    fetchEditCategory({ data: { ...item, description }, mockResponse: {...item, description}})
+    fetchEditCategory({
+      extraPath: `/${item.id}`,
+      data: { description, category_user: `${user.id}` },
+      useAxios: true
+    })
   }
 
-  const onDeleteTag = () => {
-    fetchDeleteCategory({})
-  }
+  const onDeleteCategory = () => fetchDeleteCategory({ extraPath: `/${item.id}`, useAxios: true })
 
   return (
     <div key={item.id} className="task">
@@ -70,7 +51,7 @@ function TagItem({ item, onDeletedTag }) {
             onChange={(e) => setDescription(e.target.value)}
           />
         ) : (
-          <p className="text">{description}</p>
+          <p className="text">{item.description}</p>
         )}
       </div>
       <div className="buttons">
@@ -81,13 +62,13 @@ function TagItem({ item, onDeletedTag }) {
           iconName={"fa-edit"}
           onClick={() => setEditable(!editable)}
         />
-        <Icon iconName="fa-trash" onClick={onDeleteTag} />
+        <Icon iconName="fa-trash" onClick={onDeleteCategory} />
       </div>
     </div>
   );
 }
 
-function TagList({ itemList, onDeletedTag }) {
+function TagList({ itemList, onEditedCategory, onDeletedTag }) {
   return (
     <div className="tasks-container">
       {itemList.length === 0 ? (
@@ -98,6 +79,7 @@ function TagList({ itemList, onDeletedTag }) {
         itemList.map((item, index) => (
           <TagItem
             item={item}
+            onEditedCategory={onEditedCategory}
             onDeletedTag={onDeletedTag}
           />
         ))
@@ -108,30 +90,13 @@ function TagList({ itemList, onDeletedTag }) {
 
 function CategoryScreen() {
   const { user } = useSession();
-  const [fetchCategories, categoriesResponse] = useFetchAPI({ url: 'categories', method: 'get', disableSuccessNotification: true })
+  const navigate = useNavigate();
+  
+  const [fetchCategories, categoriesResponse] = useFetchAPI({ url: 'categories', method: 'get', disableNotifications: true })
   const [fetchAddCategory, addCategoryResponse] = useFetchAPI({ url: 'categories', method: 'post' })
+  
   const [addCategoryDescription, setAddCategoryDescription] = useState('')
-  const [tags, setTags] = useState([]);
-
-  useEffect(() => {
-    fetchCategories({ data: { user_id: user.id }, mockResponse: [...taskList]})
-  }, [user.id])
-
-  useEffect(() => {
-    if (!categoriesResponse) return
-
-    if (categoriesResponse.success) {
-      setTags(categoriesResponse.data)
-    }
-  }, [categoriesResponse])
-
-  useEffect(() => {
-    if (!addCategoryResponse) return
-    
-    if (addCategoryResponse.success) {
-      setTags(tags => [...tags, addCategoryResponse.data])
-    }
-  }, [addCategoryResponse])
+  const [categories, setCategories] = useState([]);
 
   const createNewItem = (event) => {
     event.preventDefault()
@@ -140,14 +105,31 @@ function CategoryScreen() {
       return
     }
 
-    fetchAddCategory({ data: { description: addCategoryDescription }, mockResponse: {
-      id: 5, description: addCategoryDescription
-    }})
+    fetchAddCategory({
+      data: { description: addCategoryDescription, category_user: user.id },
+      useAxios: true
+    })
   }
 
-  const onDeletedTag = (tagItem) => {
-    setTags(tags => tags.filter(tag => tag.id !== tagItem.id))
-  }
+  const reloadCategories = () => fetchCategories({ queries: [`user=${user.id}`], useAxios: true })
+
+  useEffect(() => {
+    fetchCategories({
+      queries: [`user=${user.id}`],
+      useAxios: true
+    })
+  }, [user])
+
+  useEffect(() => {
+    if (!categoriesResponse) return
+    if (categoriesResponse.success) setCategories(categoriesResponse.data)
+    else setCategories([])
+  }, [categoriesResponse])
+
+  useEffect(() => {
+    if (!addCategoryResponse) return  
+    if (addCategoryResponse.success) setCategories(categories => [...categories, addCategoryResponse.data])
+  }, [addCategoryResponse])
   
   return (
     <Card className="home-card">
@@ -174,8 +156,9 @@ function CategoryScreen() {
         <h2 className='subtitle'>Categorias criadas</h2>
       </div>
       <TagList
-        itemList={tags}
-        onDeletedTag={onDeletedTag}
+        itemList={categories}
+        onEditedCategory={reloadCategories}
+        onDeletedTag={reloadCategories}
       />
     </Card>
   );

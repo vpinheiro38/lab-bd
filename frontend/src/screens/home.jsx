@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"
 import Card from "../components/card";
 import Icon from "../components/icon";
 import '../stylesheets/home.css'
@@ -11,181 +12,18 @@ import { Link } from "react-router-dom";
 import { useSession } from "../contexts/useSession";
 import useFetchAPI from "../contexts/useFetchAPI";
 
-const taskList = [
-  {
-    id: 0,
-    description: "Descrição da Tarefa",
-    completed: false,
-    creationDate: "2021-11-18T22:28:00.188Z",
-    completedDate: undefined,
-    priorityId: 2,
-    userId: 1,
-    tags: [
-    ],
-  },
-  {
-    id: 2,
-    description: 'Descrição da Tarefa',
-    completed: false,
-    creationDate: '2021-11-18T22:28:00.188Z',
-    completedDate: undefined,
-    priorityId: 1,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 2,
-    description: 'Descrição da Tarefa',
-    completed: false,
-    creationDate: '2021-11-18T22:28:00.188Z',
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 2,
-    description: 'Descrição da Tarefa',
-    completed: false,
-    creationDate: '2021-11-18T22:28:00.188Z',
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 2,
-    description: 'Descrição da Tarefa',
-    completed: false,
-    creationDate: '2021-11-18T22:28:00.188Z',
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 2,
-    description: 'Descrição da Tarefa',
-    completed: false,
-    creationDate: '2021-11-18T22:28:00.188Z',
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 2,
-    description: "Descrição da Tarefa",
-    completed: false,
-    creationDate: "2021-11-18T22:28:00.188Z",
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 2,
-    description: "Descrição da Tarefa",
-    completed: false,
-    creationDate: "2021-11-18T22:28:00.188Z",
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [{id: 0, description: 'Tag 1'}, {id: 1, description: 'Tag 1'}]
-  }
-]
-
-const tasksCompleted = [
-  {
-    id: 1,
-    description: 'Descrição da Tarefa',
-    completed: true,
-    creationDate: '2021-11-18T22:28:00.188Z',
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 1,
-    description: 'Descrição da Tarefa',
-    completed: true,
-    creationDate: '2021-11-18T22:28:00.188Z',
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 1,
-    description: 'Descrição da Tarefa',
-    completed: true,
-    creationDate: '2021-11-18T22:28:00.188Z',
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 1,
-    description: 'Descrição da Tarefa',
-    completed: true,
-    creationDate: '2021-11-18T22:28:00.188Z',
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: [
-      { id: 0, description: "Tag 1" },
-      { id: 1, description: "Tag 1" },
-    ],
-  },
-  {
-    id: 1,
-    description: 'Descrição da Tarefa',
-    completed: true,
-    creationDate: '2021-11-18T22:28:00.188Z',
-    completedDate: undefined,
-    priorityId: 0,
-    userId: 1,
-    tags: []
-  },
-]
-
-const prioritiesList = [
-  { id: 0, description: 'Alta', numberPriority: 2 },
-  { id: 1, description: 'Média', numberPriority: 1 },
-  { id: 2, description: 'Baixa', numberPriority: 0 },
-]
-
 function Home() {
+  const { user, signOut } = useSession();
+  const navigate = useNavigate();
+
+  const [taskQuery, setTaskQuery] = useState([`user=${user.id}`, 'completed=false', 'priority=[]', 'category=[]'])
+
   const [fetchPriorities, prioritiesResponse] = useFetchAPI({ url: 'priorities', method: 'get', disableSuccessNotification: true })
+  const [fetchCategories, categoriesResponse] = useFetchAPI({ url: 'categories', method: 'get', disableNotifications: true })
+  const [fetchCompletedTasks, completedTasksResponse] = useFetchAPI({ url: 'tasks', method: 'get', disableNotifications: true })
+  const [fetchIncompletedTasks, incompletedTasksResponse] = useFetchAPI({ url: 'tasks', method: 'get', disableNotifications: true })
+  const [fetchDeleteTask, deleteTaskResponse] = useFetchAPI({ url: 'tasks', method: 'delete' })
+  const [fetchCompleteTask, completeTaskResponse] = useFetchAPI({ url: 'tasks', method: 'put' })
 
   const [renderCompleted, setRenderCompleted] = useState(false)
   const [completedTasks, setCompletedTasks] = useState([])
@@ -193,73 +31,105 @@ function Home() {
   const [priorities, setPriorities] = useState([])
   const [categories, setCategories] = useState([])
 
-  const { signOut } = useSession();
-
   const onExit = () => {
     signOut();
   };
 
-  const resetFilter = () => {
-    const priorityOptions = document.getElementById('priority').children
-    const categoryOptions = document.getElementById('category').children
-
-    for (let option of priorityOptions) {      
-      option.selected = false
-    }
-
-    for (let option of categoryOptions) {
-      option.selected = false
-    }
-  }
-
   const onFilterPriorities = (selectedPriorities) => {
-    setIncompletedTasks(taskList)
+    const ids = selectedPriorities.map((priority) => priority.id).join(',')
+    const newTaskQuery = [...taskQuery]
+    newTaskQuery[2] = `priority=[${ids}]`
+
+    setTaskQuery(newTaskQuery)
+
+    fetchIncompletedTasks({
+      queries: newTaskQuery.filter(query => !query.includes('[]')),
+      useAxios: true
+    })
   }
 
   const onFilterCategories = (selectedCategories) => {
-    setIncompletedTasks(taskList)
+    const ids = selectedCategories.map((category) => category.id).join(',')
+    const newTaskQuery = [...taskQuery]
+    newTaskQuery[3] = `category=[${ids}]`
+
+    setTaskQuery(newTaskQuery)
+
+    fetchIncompletedTasks({
+      queries: newTaskQuery.filter(query => !query.includes('[]')),
+      useAxios: true
+    })
   }
 
-  const onFilterNow = (event) => {
-    resetFilter()
-    setIncompletedTasks(taskList)
+  const completeTask = (task, completed_at) => {
+    const { description, deadline_at, task_priority, task_user } = task
+    fetchCompleteTask({
+      data: {
+        description, deadline_at, completed_at,
+        task_priority, task_user
+      },
+      extraPath: `/${task.id}`, useAxios: true
+    })
   }
+  const reloadCategories = () => fetchIncompletedTasks({
+    queries: taskQuery.filter(query => !query.includes('[]')),
+    useAxios: true
+  })
 
-  const completeTask = (task) => {
-    setIncompletedTasks(taskList)
-    setCompletedTasks(tasksCompleted)
-  }
-
-  const deleteTask = (task) => {
-    const completed = task.completed
-
-    if (completed)
-      setCompletedTasks(tasksCompleted)
-    else
-      setIncompletedTasks(taskList)
-  }
-
-  useEffect(() => {
-    setCompletedTasks(tasksCompleted)
-    setIncompletedTasks(taskList)
-  }, [])
+  const deleteTask = (task) => fetchDeleteTask({ extraPath: `/${task.id}`, useAxios: true })
 
   useEffect(() => {
     fetchPriorities({ useAxios: true })
-  }, [])
+
+    fetchCategories({
+      queries: [`user=${user.id}`],
+      useAxios: true
+    })
+
+    fetchCompletedTasks({
+      queries: [`user=${user.id}`, 'completed=true'],
+      useAxios: true
+    })
+
+    fetchIncompletedTasks({
+      queries: [`user=${user.id}`, 'completed=false'],
+      useAxios: true
+    })
+  }, [user])
+
+  useEffect(() => {
+    if (!incompletedTasksResponse) return
+    if (incompletedTasksResponse.success) setIncompletedTasks(incompletedTasksResponse.data)
+    else setIncompletedTasks([])
+  }, [incompletedTasksResponse])
+
+  useEffect(() => {
+    if (!completedTasksResponse) return
+    if (completedTasksResponse.success) setCompletedTasks(completedTasksResponse.data)
+    else setCompletedTasks([])
+  }, [completedTasksResponse])
 
   useEffect(() => {
     if (!prioritiesResponse) return
-
-    if (prioritiesResponse.success) {
-      const priorityList = prioritiesResponse.data
-      setPriorities(priorityList)
-    }
+    if (prioritiesResponse.success) setPriorities(prioritiesResponse.data)
+    else setPriorities([])
   }, [prioritiesResponse])
 
   useEffect(() => {
-    setCategories([])
-  }, [])
+    if (!categoriesResponse) return
+    if (categoriesResponse.success) setCategories(categoriesResponse.data)
+    else setCategories([])
+  }, [categoriesResponse])
+
+  useEffect(() => {
+    if (!completeTaskResponse) return
+    if (completeTaskResponse.success) reloadCategories()
+  }, [completeTaskResponse])
+
+  useEffect(() => {
+    if (!deleteTaskResponse) return
+    if (deleteTaskResponse.success) reloadCategories()
+  }, [deleteTaskResponse])
 
   const TaskList = ({ title, completed }) => {
     const tasks = completed ? completedTasks : incompletedTasks
@@ -291,7 +161,6 @@ function Home() {
       <div className="header">
         <h1 className="title">Lista de Tarefas</h1>
         <div>
-          <LinkButton to="/routine" describe="Rotinas" />
           <LinkButton to="/category" describe="Categorias" />
           <button
             className="button button-header"
@@ -313,10 +182,9 @@ function Home() {
           <Dropdown 
             type='category'
             title='Filtro de Categorias'
-            options={[]}
+            options={categories}
             onFilter={onFilterCategories}              
           />
-          <button className="button button-header" onClick={onFilterNow}>Ver Tarefas para Agora</button>
           <Link to='/task'>
             <button className="button is-link">Adicionar Tarefa</button>
           </Link>

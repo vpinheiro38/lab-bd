@@ -15,6 +15,7 @@ export default function SessionProvider({ children }) {
 
   useEffect(() => {
     async function loadStorageData() {
+      console.log(localStorage.getItem("taskmanager:user"))
       const tmp = JSON.parse(localStorage.getItem("taskmanager:user"));
       const localUser = tmp !== null ? tmp : undefined;
       setUser(localUser);
@@ -28,7 +29,7 @@ export default function SessionProvider({ children }) {
 
     if (userLoginResponse.success) {
       setUser(userLoginResponse.data)
-      localStorage.setItem("taskmanager:user", userLoginResponse.data)
+      localStorage.setItem("taskmanager:user", JSON.stringify(userLoginResponse.data))
     }
   }, [userLoginResponse])
 
@@ -37,7 +38,7 @@ export default function SessionProvider({ children }) {
 
     if (registerUserResponse.success) {
       setUser(registerUserResponse.data)
-      localStorage.setItem("taskmanager:user", registerUserResponse.data)
+      localStorage.setItem("taskmanager:user", JSON.stringify(registerUserResponse.data))
     }
   }, [registerUserResponse])
 
