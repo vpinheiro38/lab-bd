@@ -20,22 +20,25 @@ function TaskPage({ taskId }) {
 
   const [fetchPriorities, prioritiesResponse] = useFetchAPI({ url: 'priorities', method: 'get', disableSuccessNotification: true })
   const [fetchCategories, categoriesResponse] = useFetchAPI({ url: 'categories', method: 'get', disableSuccessNotification: true })
-  const [fetchGetTask, getTaskResponse] = useFetchAPI({ url: `tasks/${taskId}`, method: 'get', disableSuccessNotification: true })
+  
+  const [fetchGetTask, getTaskResponse] = useFetchAPI({ url: `tasks`, method: 'get', disableSuccessNotification: true })
   const [fetchTask, taskResponse] = useFetchAPI({ url: taskId ? `tasks/${taskId}` : 'tasks', method: taskId ? 'put' : 'post' })
+  
+  const [fetchGetCategoryTask, getCategoryTaskResponse] = useFetchAPI({ url: 'categories-tasks', method: 'get', disableNotifications: true })
   const [fetchCategoryTask, categoryTaskResponse] = useFetchAPI({ url: 'categories-tasks', method: 'post' })
+  const [fetchDeleteCategoryTask, deleteCategoryTaskResponse] = useFetchAPI({ url: 'categories-tasks', method: 'delete', disableSuccessNotification: true })
   
   const [priorities, setPriorities] = useState([])
   const [categories, setCategories] = useState([])
   
-  const [editingTask, setEditingTask] = useState()
+  const [editingTask, setEditingTask] = useState({})
   const [description, setDescription] = useState('')
   const [deadline, setDeadline] = useState();
   const [taskPriority, setTaskPriority] = useState({})
-  const [taskCategory, setTaskCategory] = useState({})
+  const [taskCategories, setTaskCategories] = useState([])
 
   const onFilterCategories = (selectedCategories) => {
-    if (selectedCategories.length > 0) setTaskCategory(selectedCategories[0])
-    else setTaskCategory({})
+    setTaskCategories(selectedCategories)
   }
 
   const onChangePriority = (e) => {
@@ -48,6 +51,11 @@ function TaskPage({ taskId }) {
   }
 
   const onAddTask = (e) => {
+    const fixCompletedAt = (value) => {
+      if (!value) return null
+      return value.slice(0, -1)
+    }
+
     const fixDeadlineTime = (datetime) => {
       const deadline_at = new Date(datetime)
       deadline_at.setHours(deadline_at.getHours() - 3)
@@ -55,32 +63,21 @@ function TaskPage({ taskId }) {
     }
 
     e.preventDefault()
-    if (isStringEmpty(description) || !taskPriority || !taskCategory) {
+    if (isStringEmpty(description) || !taskPriority) {
       toast.error("Algum campo está vazio!")
       return
-    }
-    
-    if (deadline) {
     }
 
     fetchTask({ 
       data: {
         description: description,
-        completed_at: editingTask ? editingTask.completed_at : null,
+        completed_at: editingTask ? fixCompletedAt(editingTask.completed_at) : null,
         deadline_at: deadline ? fixDeadlineTime(deadline) : null,
         task_priority: taskPriority.id,
         task_user: user.id
       },
       useAxios: true
     })
-
-    // fetchCategoryTask({
-    //   data: {
-    //     category_id: taskCategory.id,
-    //     task_id: 
-    //   },
-    //   useAxios: true
-    // })
   }
 
   const Field = ({ label, children }) => (
@@ -100,6 +97,20 @@ function TaskPage({ taskId }) {
       useAxios: true
     })
   }, [])
+  
+  useEffect(() => {
+    if (!taskId || priorities.length === 0) return
+
+    fetchGetTask({
+      extraPath: `/${taskId}`,
+      useAxios: true
+    })
+
+    fetchGetCategoryTask({
+      queries: [`task=${taskId}`],
+      useAxios: true
+    })
+  }, [taskId, priorities])
 
   useEffect(() => {
     if (!prioritiesResponse) return
@@ -116,41 +127,63 @@ function TaskPage({ taskId }) {
   }, [categoriesResponse])
 
   useEffect(() => {
+    if (!getCategoryTaskResponse) return
+    if (getCategoryTaskResponse.success) {
+      const categoriesFromTask = categories.filter((category) => (
+        getCategoryTaskResponse.data.some(categoryTask => categoryTask.category_id === category.id)
+      ))
+      setTaskCategories(categoriesFromTask)
+      setEditingTask(editingTask => ({ ...editingTask, categories: categoriesFromTask, categories_tasks: getCategoryTaskResponse.data }))
+    } else {
+      setTaskCategories([])
+      setEditingTask(editingTask => ({ ...editingTask, categories: [], categories_tasks: [] }))
+    }
+  }, [getCategoryTaskResponse])
+  
+  useEffect(() => {
     if (!taskResponse) return
-    if (taskResponse.success) navigate('/')
+    if (taskResponse.success) {
+      taskCategories
+        .filter((category => !editingTask.categories.some(editingTaskCategory => editingTaskCategory.id === category.id)))
+        .forEach((category) => {
+          fetchCategoryTask({
+            data: {
+              category_id: category.id,
+              task_id: taskResponse.data.data.id
+            },
+            useAxios: true
+          })
+        })
+
+      editingTask.categories
+        .filter((editingTaskCategory => !taskCategories.some(category => editingTaskCategory.id === category.id)))
+        .forEach(category => {
+          fetchDeleteCategoryTask({
+            extraPath: `/${editingTask.categories_tasks.filter(categoryTask => categoryTask.category_id === category.id)[0].id}`,
+            useAxios: true
+          })
+        })
+    }
   }, [taskResponse])
 
   useEffect(() => {
-    if (!taskId || priorities.length === 0) return
+    if (!categoryTaskResponse) return
+    if (categoryTaskResponse.success) navigate('/')
+  }, [categoryTaskResponse])
 
-    fetchGetTask({mockResponse: {
-      id: taskId,
-      description: 'Descrição da Tarefa',
-      completed: false,
-      creationDate: '2021-11-18T22:28:00.188Z',
-      completedDate: undefined,
-      deadline: '2021-11-18T22:28:00.188Z',
-      task_priority: 1,
-      task_user: 1,
-      tags: [
-        { id: 0, description: "Tag 1" },
-        { id: 1, description: "Tag 1" },
-      ],
-    }})
-  }, [taskId, priorities])
 
   useEffect(() => {
     if (!getTaskResponse) return
 
     if (getTaskResponse.success) {
       const editTask = getTaskResponse.data
-      setEditingTask(editTask)
+      setEditingTask(editingTask => ({ ...editingTask, ...editTask }))
       setDescription(editTask.description)
-      setDeadline(editTask.deadline && new Date(editTask.deadline))
+      setDeadline(editTask.deadline_at && new Date(editTask.deadline_at))
       setTaskPriority(priorities.filter(item => item.id === editTask.task_priority)[0])
     }
   }, [getTaskResponse])
-  console.log(deadline)
+
   return (
     <Card className='home-card'>
       <div className='header'>
@@ -183,14 +216,18 @@ function TaskPage({ taskId }) {
               </select>
             </div>
           </Field>
-          <Field label='Categorias'>
+          <label className='input-container'>
+            <div className="field-label">
+              <p className="label">Categorias</p>
+            </div>
             <Dropdown
               type='category'
               title='Categorias'
               options={categories}
+              defaultSelected={taskCategories}
               onFilter={onFilterCategories}
             />
-          </Field>
+          </label>
         </div>          
         <Field label='Prazo (opcional)'>
           <DatePicker

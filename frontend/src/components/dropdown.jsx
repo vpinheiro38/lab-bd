@@ -1,18 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import '../stylesheets/components.css'
 
-function Dropdown({ title, type, options, onFilter }) {
+function Dropdown({ title, type, options, defaultSelected, onFilter }) {
   const [selected, setSelected] = useState([])
 
   const onChangeSelection = (e) => {
-    const selectedOptions = options.filter((option, index) => {
+    const selectedOptions = options.filter((_, index) => {
       return e.target[index].selected
     })
 
     setSelected(selectedOptions)
     onFilter(selectedOptions)
   }
-  console.log(options)
+
+  useEffect(() => {
+    setSelected(defaultSelected ? defaultSelected : [])
+  }, [defaultSelected])
+
   return (
     <div className="dropdown is-hoverable">
       <div className="dropdown-trigger">
@@ -28,7 +32,7 @@ function Dropdown({ title, type, options, onFilter }) {
           <select id={type} multiple size={`${options.length}`} onChange={onChangeSelection}>
             {options.map(option => {
               return (
-                <option key={option.id} value={option.description}>
+                <option key={option.id} value={option.description} selected={selected.filter((optionSelected) => optionSelected.id === option.id).length > 0}>
                   {option.description}
                 </option>
               )

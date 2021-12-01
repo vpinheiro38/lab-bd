@@ -1,8 +1,25 @@
 import '../stylesheets/components.css'
 import Icon from './icon'
 import { Link } from "react-router-dom"
+import useFetchAPI from '../contexts/useFetchAPI'
+import { useEffect, useState } from 'react'
 
 function Task({ task, onCompleteTask, onDeleteTask }) {
+  const [fetchCategoriesTask, categoriesTaskResponse] = useFetchAPI({ url: 'categories-tasks', method: 'get', disableNotifications: true })
+  const [categoriesTask, setCategoriesTask] = useState([])
+
+  useEffect(() => {
+    fetchCategoriesTask({
+      queries: [`task=${task.id}`],
+      useAxios: true
+    })
+  }, [task.id])
+
+  useEffect(() => {
+    if (!categoriesTaskResponse) return
+    if (categoriesTaskResponse.success) setCategoriesTask(categoriesTaskResponse.data)
+    else setCategoriesTask([])
+  }, [categoriesTaskResponse])
 
   const PriorityTag = () => {
     const colors = ['is-success', 'is-warning', 'is-danger']
@@ -31,9 +48,9 @@ function Task({ task, onCompleteTask, onDeleteTask }) {
         <div className='tags'>
           <PriorityTag />
           <Deadline />
-          {task.category_description && (
-            <span className="tag is-info">{task.category_description}</span>
-          )}          
+          {categoriesTask.map((categoryTask) => (
+            <span className="tag is-info">{categoryTask.category_description}</span>
+          ))}
         </div>
         <p className='text'>{task.description}</p>
       </div>
