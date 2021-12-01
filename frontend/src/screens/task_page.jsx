@@ -18,8 +18,8 @@ function TaskPage({ taskId }) {
   const { user } = useSession()
   const navigate = useNavigate();
 
-  const [fetchPriorities, prioritiesResponse] = useFetchAPI({ url: 'priorities', method: 'get', disableSuccessNotification: true })
-  const [fetchCategories, categoriesResponse] = useFetchAPI({ url: 'categories', method: 'get', disableSuccessNotification: true })
+  const [fetchPriorities, prioritiesResponse] = useFetchAPI({ url: 'priorities', method: 'get', disableNotifications: true })
+  const [fetchCategories, categoriesResponse] = useFetchAPI({ url: 'categories', method: 'get', disableNotifications: true })
   
   const [fetchGetTask, getTaskResponse] = useFetchAPI({ url: `tasks`, method: 'get', disableSuccessNotification: true })
   const [fetchTask, taskResponse] = useFetchAPI({ url: taskId ? `tasks/${taskId}` : 'tasks', method: taskId ? 'put' : 'post' })
@@ -155,14 +155,16 @@ function TaskPage({ taskId }) {
           })
         })
 
-      editingTask.categories
-        .filter((editingTaskCategory => !taskCategories.some(category => editingTaskCategory.id === category.id)))
-        .forEach(category => {
-          fetchDeleteCategoryTask({
-            extraPath: `/${editingTask.categories_tasks.filter(categoryTask => categoryTask.category_id === category.id)[0].id}`,
-            useAxios: true
+      if (editingTask.categories && editingTask.categories.length > 0) {
+        editingTask.categories
+          .filter((editingTaskCategory => !taskCategories.some(category => editingTaskCategory.id === category.id)))
+          .forEach(category => {
+            fetchDeleteCategoryTask({
+              extraPath: `/${editingTask.categories_tasks.filter(categoryTask => categoryTask.category_id === category.id)[0].id}`,
+              useAxios: true
+            })
           })
-        })
+      }
     }
   }, [taskResponse])
 

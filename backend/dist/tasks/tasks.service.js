@@ -52,7 +52,7 @@ let TasksService = class TasksService {
             params.push(JSON.parse(priority));
         }
         connection.connect();
-        const [results, fields] = await connection.promise().query('SELECT * from vw_tasks WHERE ' + queries.join(' and ') + (completed_tasks ? ' ORDER BY completed_at ASC' : ' ORDER BY task_priority ASC, deadline_at ASC, created_at ASC'), params);
+        const [results, fields] = await connection.promise().query('SELECT * from vw_tasks WHERE ' + queries.join(' and ') + (completed_tasks ? ' ORDER BY completed_at ASC' : ' ORDER BY task_priority ASC, -deadline_at ASC, created_at ASC'), params);
         if (results.length > 0) {
             return { success: true, message: 'tasks encontradas', data: results };
         }
