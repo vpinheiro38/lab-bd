@@ -56,13 +56,13 @@ function Login({ onLogin }) {
   const RegisterUser = () => (
     <form className='form'>
       <label className='input-container'>
-        <input className="input" type="text" placeholder='Nome' onChange={e => setName(e.target.value)} />
+        <input id='name' className="input" type="text" placeholder='Nome' onChange={e => setName(e.target.value)} />
       </label>
       <label className='input-container'>
-        <input className="input" type="text" placeholder='Email' onChange={e => setEmail(e.target.value)} />
+        <input id='email' className="input" type="text" placeholder='Email' onChange={e => setEmail(e.target.value)} />
       </label>
       <label className='input-container'>
-        <input className="input" type="password" placeholder='Senha' onChange={e => setPassword(e.target.value)} />
+        <input id='password' className="input" type="password" placeholder='Senha' onChange={e => setPassword(e.target.value)} />
       </label>
       <div>
         <button className="button is-primary is-fullwidth" type="submit" onClick={onClickToRegister}>Registrar</button>

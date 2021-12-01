@@ -62,19 +62,32 @@ function Home() {
   }
 
   const completeTask = (task, completed_at) => {
+    const fixDeadlineAt = (value) => {
+      if (!value) return
+      return value.slice(0, -1)
+    }
+
     const { description, deadline_at, task_priority, task_user } = task
+
     fetchCompleteTask({
       data: {
-        description, deadline_at, completed_at,
+        description, deadline_at: fixDeadlineAt(deadline_at), completed_at,
         task_priority, task_user
       },
       extraPath: `/${task.id}`, useAxios: true
     })
   }
-  const reloadCategories = () => fetchIncompletedTasks({
-    queries: taskQuery.filter(query => !query.includes('[]')),
-    useAxios: true
-  })
+  const reloadTasks = () => {
+    fetchIncompletedTasks({
+      queries: taskQuery.filter(query => !query.includes('[]')),
+      useAxios: true
+    })
+
+    fetchCompletedTasks({
+      queries: [`user=${user.id}`, 'completed=true'],
+      useAxios: true
+    })
+  }
 
   const deleteTask = (task) => fetchDeleteTask({ extraPath: `/${task.id}`, useAxios: true })
 
@@ -123,12 +136,12 @@ function Home() {
 
   useEffect(() => {
     if (!completeTaskResponse) return
-    if (completeTaskResponse.success) reloadCategories()
+    if (completeTaskResponse.success) reloadTasks()
   }, [completeTaskResponse])
 
   useEffect(() => {
     if (!deleteTaskResponse) return
-    if (deleteTaskResponse.success) reloadCategories()
+    if (deleteTaskResponse.success) reloadTasks()
   }, [deleteTaskResponse])
 
   const TaskList = ({ title, completed }) => {
