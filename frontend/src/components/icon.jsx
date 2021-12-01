@@ -1,10 +1,10 @@
 import "../stylesheets/components.css";
 
-function Icon({ iconName, onClick }) {
+function Icon({ iconType = 'fas', iconName, onClick }) {
   return (
     <button className="button is-white" onClick={onClick}>
       <span className="icon is-small">
-        <i className={`fas ${iconName}`}></i>
+        <i className={`${iconType} ${iconName}`}></i>
       </span>
     </button>
   );
