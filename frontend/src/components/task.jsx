@@ -21,6 +21,12 @@ function Task({ task, onCompleteTask, onDeleteTask }) {
     else setCategoriesTask([])
   }, [categoriesTaskResponse])
 
+  const getCompletedAt = () => {
+    const completed_at = new Date()
+    completed_at.setHours(completed_at.getHours() - 3)
+    return completed_at.toJSON().slice(0, -1)
+  }
+
   const PriorityTag = () => {
     const colors = ['is-success', 'is-warning', 'is-danger']
 
@@ -36,6 +42,7 @@ function Task({ task, onCompleteTask, onDeleteTask }) {
 
     const deadlineDate = new Date(task.deadline_at)
     deadlineDate.setSeconds(0)
+    deadlineDate.setHours(deadlineDate.getHours())
 
     return (
       <span className="tag is-info">Prazo: {deadlineDate.toLocaleString()}</span>
@@ -58,7 +65,7 @@ function Task({ task, onCompleteTask, onDeleteTask }) {
         <Icon
           iconType={task.completed_at ? 'fa' : 'far'}
           iconName='fa-check-square'
-          onClick={() => onCompleteTask(task, task.completed_at ? null : (new Date()).toJSON().slice(0, -1))}
+          onClick={() => onCompleteTask(task, task.completed_at ? null : getCompletedAt())}
         />
         <Link to={`/task/${task.id}`}>
           <Icon iconName='fa-edit' />

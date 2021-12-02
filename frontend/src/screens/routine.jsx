@@ -153,7 +153,6 @@ function Screen() {
       const newArray = items.filter(
         (tagItem, tagItemIndex) => tagItemIndex !== index
       );
-      console.log(newArray, index);
       setItems(newArray);
     },
     [items]

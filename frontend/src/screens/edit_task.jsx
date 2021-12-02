@@ -4,7 +4,6 @@ import TaskPage from "./task_page";
 
 function EditTask() {  
   let params = useParams();
-  console.log(params)
 
   return (
     <TaskPage

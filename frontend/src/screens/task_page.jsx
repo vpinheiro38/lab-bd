@@ -143,28 +143,30 @@ function TaskPage({ taskId }) {
   useEffect(() => {
     if (!taskResponse) return
     if (taskResponse.success) {
-      taskCategories
-        .filter((category => !editingTask.categories.some(editingTaskCategory => editingTaskCategory.id === category.id)))
-        .forEach((category) => {
-          fetchCategoryTask({
-            data: {
-              category_id: category.id,
-              task_id: taskResponse.data.data.id
-            },
+      const categoriesToAdd = !editingTask.categories ? [] : taskCategories.filter((category => !editingTask.categories.some(editingTaskCategory => editingTaskCategory.id === category.id)))
+      categoriesToAdd.forEach((category) => {
+        fetchCategoryTask({
+          data: {
+            category_id: category.id,
+            task_id: taskResponse.data.data.id
+          },
+          useAxios: true
+        })
+      })
+      
+      let categoriesToRemove = []
+
+      if (editingTask.categories && editingTask.categories.length > 0) {
+        categoriesToRemove = editingTask.categories.filter((editingTaskCategory => !taskCategories.some(category => editingTaskCategory.id === category.id)))
+        categoriesToRemove.forEach(category => {
+          fetchDeleteCategoryTask({
+            extraPath: `/${editingTask.categories_tasks.filter(categoryTask => categoryTask.category_id === category.id)[0].id}`,
             useAxios: true
           })
         })
-
-      if (editingTask.categories && editingTask.categories.length > 0) {
-        editingTask.categories
-          .filter((editingTaskCategory => !taskCategories.some(category => editingTaskCategory.id === category.id)))
-          .forEach(category => {
-            fetchDeleteCategoryTask({
-              extraPath: `/${editingTask.categories_tasks.filter(categoryTask => categoryTask.category_id === category.id)[0].id}`,
-              useAxios: true
-            })
-          })
       }
+
+      if (categoriesToAdd.length === 0 && categoriesToRemove.length === 0) navigate('/')
     }
   }, [taskResponse])
 

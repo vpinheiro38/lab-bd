@@ -60,18 +60,23 @@ function Home() {
       useAxios: true
     })
   }
-
   const completeTask = (task, completed_at) => {
     const fixDeadlineAt = (value) => {
       if (!value) return
       return value.slice(0, -1)
     }
 
+    const fixDeadlineTime = (datetime) => {
+      const deadline_at = new Date(datetime)
+      deadline_at.setHours(deadline_at.getHours() - 3)
+      return deadline_at.toJSON().slice(0, -1)
+    }
+
     const { description, deadline_at, task_priority, task_user } = task
 
     fetchCompleteTask({
       data: {
-        description, deadline_at: fixDeadlineAt(deadline_at), completed_at,
+        description, deadline_at: fixDeadlineTime(deadline_at), completed_at,
         task_priority, task_user
       },
       extraPath: `/${task.id}`, useAxios: true
@@ -145,7 +150,13 @@ function Home() {
   }, [deleteTaskResponse])
 
   const TaskList = ({ title, completed }) => {
-    const tasks = completed ? completedTasks : incompletedTasks
+    const returnedTasks = completed ? completedTasks : incompletedTasks
+    const taskIds = {}
+    const tasks = returnedTasks.filter((entry) => {
+      if (taskIds[entry.id]) return false;
+      taskIds[entry.id] = true;
+      return true;
+    })
 
     return (
       <div className='tasks-container'>
@@ -155,7 +166,8 @@ function Home() {
             <h6 className='subtitle is-6'>Nenhuma Tarefa</h6>
           </div>
         ) : (
-          tasks.map(task => (
+          tasks
+          .map(task => (
             <Task
               key={task.id}
               task={task}              
