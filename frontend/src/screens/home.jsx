@@ -18,7 +18,7 @@ function Home() {
 
   const [taskQuery, setTaskQuery] = useState([`user=${user.id}`, 'completed=false', 'priority=[]', 'category=[]'])
 
-  const [fetchPriorities, prioritiesResponse] = useFetchAPI({ url: 'priorities', method: 'get', disableSuccessNotification: true })
+  const [fetchPriorities, prioritiesResponse] = useFetchAPI({ url: 'priorities', method: 'get', disableNotifications: true })
   const [fetchCategories, categoriesResponse] = useFetchAPI({ url: 'categories', method: 'get', disableNotifications: true })
   const [fetchCompletedTasks, completedTasksResponse] = useFetchAPI({ url: 'tasks', method: 'get', disableNotifications: true })
   const [fetchIncompletedTasks, incompletedTasksResponse] = useFetchAPI({ url: 'tasks', method: 'get', disableNotifications: true })
