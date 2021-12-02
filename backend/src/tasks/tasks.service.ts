@@ -32,7 +32,7 @@ export class TasksService {
     const params = [];
     let completed_tasks = false;
     if(!!user){
-      queries.push(' user_id = ? ');
+      queries.push(' task_user = ? ');
       params.push(user);
     }
     if(completed && completed === 'false'){
